@@ -10,7 +10,7 @@ const NeuralSpine = () => {
           {[...Array(20)].map((_, i) => (
             <div
               key={i}
-              className="w-[10px] h-[20px] rounded-full bg-cyan-400 shadow-[0_0_8px_#00f0ff,0_0_16px_#00f0ff] animate-pulse"
+              className="w-[20px] h-[40px] bg-red-500"
               style={{ animationDelay: `${i * 0.1}s` }}
             />
           ))}
