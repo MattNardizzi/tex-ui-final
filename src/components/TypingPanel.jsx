@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { fetchTexResponse } from '../../lib/texAPI';
+import { fetchTexResponse } from '../lib/texAPI';
 
 export default function TypingPanel() {
   const [prompt, setPrompt] = useState('');
