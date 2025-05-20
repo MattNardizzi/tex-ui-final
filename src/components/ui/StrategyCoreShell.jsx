@@ -6,19 +6,18 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 import { createNoise2D } from 'simplex-noise';
-import * as Tone from 'tone';
 
-import { getNeedPulse } from '../systems/needPulse';
-import { getEmotionGlowColor, getEmotionPulseRate } from '../systems/emotionEngine';
+import { getNeedPulse } from '@/systems/needPulse';
+import { getEmotionGlowColor, getEmotionPulseRate } from '@/systems/emotionEngine';
 
 import TypingPanel from './TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
 import GazeEyes from './GazeEyes';
+import MutationOverlay from './MutationOverlay';
 
 const CFG = {
   breathPeriod: 4.5,
-  heartBpm: 92,
   emaAlpha: 0.05,
   beamRadius: 0.017,
   beamHeight: 1.35,
@@ -79,42 +78,16 @@ export default function StrategyCoreShell() {
     );
     scene.add(beam);
 
-    // ✨ Flare sprite
-    new THREE.TextureLoader().load('/flare.png', (tex) => {
-      const flare = new THREE.Sprite(
-        new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.3 })
-      );
-      flare.scale.set(0.6, 0.6, 1);
-      flare.position.y = CFG.beamHeight / 2;
-      beam.add(flare);
-      animateHooks.push((t) => {
-        flare.material.opacity = 0.25 + 0.15 * Math.sin(t * 2.2);
-      });
-    });
-
-    // 🔊 Heartbeat loop
-    const heart = new Tone.Player('/heartbeat.wav').toDestination();
-    const analyser = new Tone.FFT(32);
-    heart.connect(analyser);
-    (async () => {
-      await Tone.start();
-      heart.loop = true;
-      heart.autostart = true;
-    })();
-
     const noise2D = createNoise2D();
     const animateHooks = [];
-    const heartFreq = CFG.heartBpm / 60;
     let t = 0;
     let smooth = getNeedPulse();
 
-    // 🎞️ Animation loop
     const animate = () => {
       t += 0.0065;
       const breath = (Math.sin((t / CFG.breathPeriod) * Math.PI * 2) + 1) / 2;
-      const beat = Math.max(0, Math.sin(t * heartFreq * Math.PI * 2));
       const pulseRate = getEmotionPulseRate();
-      smooth += CFG.emaAlpha * (Math.min(1, breath * 0.7 + beat * 0.4) - smooth);
+      smooth += CFG.emaAlpha * (Math.min(1, breath * 0.7) - smooth);
 
       beamMat.uniforms.time.value = t;
       beamMat.uniforms.pulse.value = smooth * pulseRate + 0.15;
@@ -131,7 +104,6 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 🔁 Resize
     const onResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
@@ -144,28 +116,29 @@ export default function StrategyCoreShell() {
       window.removeEventListener('resize', onResize);
       mount.current.removeChild(renderer.domElement);
       renderer.dispose();
-      Tone.Transport.stop();
-      heart.dispose();
     };
   }, []);
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* 🌑 Deep Fade */}
+      {/* 🌑 Fade Overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* 👁 Gaze */}
+      {/* 👁 Gaze Eyes */}
       <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
         <GazeEyes />
       </div>
 
-      {/* 💬 Input */}
+      {/* 💬 Typing Input */}
       <TypingPanel />
 
-      {/* 🧠 Overlay */}
+      {/* 🧠 State Overlay */}
       <InstitutionalOverlay />
 
-      {/* 📈 Market */}
+      {/* 🔄 Mutation Feed */}
+      <MutationOverlay />
+
+      {/* 📈 Market Ticker */}
       <div className="pointer-events-none absolute bottom-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
