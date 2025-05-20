@@ -1,16 +1,9 @@
-import TypingPanel from '../components/TypingPanel.jsx';
-import NeuralSpine from '../components/NeuralSpine';
+import StrategyCoreShell from '../components/ui/StrategyCoreShell';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-black text-white p-6 relative overflow-hidden">
-      <NeuralSpine />
-
-      <h1 className="text-3xl font-bold mb-6 text-center">
-        🧠 Tex: Sovereign Cognition Interface
-      </h1>
-
-      <TypingPanel />
+    <main className="min-h-screen bg-black text-white overflow-hidden">
+      <StrategyCoreShell />
     </main>
   );
 }
