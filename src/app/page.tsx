@@ -1,5 +1,6 @@
 // src/app/page.tsx
 import TypingPanel from '../components/TypingPanel.jsx';
+import NeuralSpine from '../components/NeuralSpine';
 
 export default function Home() {
   return (
