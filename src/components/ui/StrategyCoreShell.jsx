@@ -2,7 +2,7 @@
 import React from "react";
 import BeamRenderer from "./BeamRenderer";
 import TypingPanel from "../TypingPanel"; // Adjusted path to match actual location
-import MutationOverlay from "./MutationOverlay";
+import MutationOverlay from "./InstitutionalOverlay"; // Now using InstitutionalOverlay as MutationOverlay
 import StatusHUD from "./StatusHUD";
 import ComputationButton from "./ComputationButton";
 
@@ -21,7 +21,7 @@ export default function StrategyCoreShell() {
       {/* Output feed from Tex */}
       <TypingPanel />
 
-      {/* Subtle glitch effect overlay */}
+      {/* Subtle glitch effect overlay (InstitutionalOverlay repurposed) */}
       <MutationOverlay />
     </div>
   );
