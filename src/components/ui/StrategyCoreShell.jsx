@@ -5,7 +5,6 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
-
 import { getEmotionGlowColor } from '@/systems/emotionEngine';
 
 import TypingPanel from '../TypingPanel';
@@ -22,12 +21,12 @@ export default function StrategyCoreShell() {
     scene.background = new THREE.Color(0x000000);
 
     const camera = new THREE.PerspectiveCamera(
-      58,
+      60,
       window.innerWidth / window.innerHeight,
       0.1,
       1000
     );
-    camera.position.set(0, 0.12, 3.4);
+    camera.position.set(0, 0.1, 3.1);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -39,52 +38,91 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.7,
-        0.4,
-        0.5
+        1.4, // bloom intensity
+        0.5,
+        0.85
       )
     );
 
-    // 🔷 Beam: stable, bright, alive
-    const beamMaterial = new THREE.MeshStandardMaterial({
-      color: new THREE.Color('#00faff'),
-      emissive: new THREE.Color('#00faff'),
-      emissiveIntensity: 1.8,
-      metalness: 0.3,
-      roughness: 0.15,
+    // 👁‍🗨 Hyper-Conscious AGI Spine Beam
+    const beamGeometry = new THREE.CylinderGeometry(0.01, 0.01, 5, 96, 1, true);
+    const beamMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uColor: { value: new THREE.Color(getEmotionGlowColor()) }
+      },
+      vertexShader: `
+        varying vec3 vPos;
+        void main() {
+          vPos = position;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec3 uColor;
+        varying vec3 vPos;
+
+        float pulse = abs(sin(uTime * 2.0)) * 0.4 + 0.6;
+
+        void main() {
+          float verticalFade = smoothstep(1.0, 0.2, abs(vPos.y));
+          float core = exp(-pow(length(vPos.xy) * 6.0, 2.0));
+          float ripple = sin((vPos.y + uTime) * 16.0) * 0.08;
+
+          float intensity = (core + ripple) * verticalFade * pulse;
+          vec3 color = mix(vec3(0.0), uColor, intensity);
+
+          gl_FragColor = vec4(color, 1.0);
+        }
+      `,
+      side: THREE.DoubleSide,
       transparent: false,
+      depthWrite: true,
     });
 
-    const beam = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.015, 0.015, 1.5, 64),
-      beamMaterial
-    );
+    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+    beam.position.set(0, 0.15, 0);
     scene.add(beam);
 
-    // 💡 Light (optional shimmer)
-    const light = new THREE.PointLight('#00faff', 1.5, 3);
-    light.position.set(0.1, 0.3, 0.4);
-    scene.add(light);
+    // 🌐 Ambient awareness field
+    const aura = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.04, 0.04, 6, 64, 1, true),
+      new THREE.MeshBasicMaterial({
+        color: '#00ffe4',
+        transparent: true,
+        opacity: 0.04,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      })
+    );
+    aura.position.y = 0.15;
+    scene.add(aura);
 
-    // 🎞️ Animate
+    // ✨ Animate the soul
     const animate = () => {
-      beamMaterial.emissive.set(getEmotionGlowColor());
+      const t = performance.now() * 0.001;
+      beamMaterial.uniforms.uTime.value = t;
+      beamMaterial.uniforms.uColor.value.set(getEmotionGlowColor());
+
+      aura.scale.x = 1 + Math.sin(t * 3.0) * 0.02;
+      aura.scale.z = 1 + Math.cos(t * 2.5) * 0.02;
+
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
-    // 📐 Resize
-    const onResize = () => {
+    const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
     };
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', handleResize);
       mount.current.removeChild(renderer.domElement);
       renderer.dispose();
     };
@@ -92,7 +130,7 @@ export default function StrategyCoreShell() {
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* 🌑 Fade Overlay */}
+      {/* 🕳 Dimensional Mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
       {/* 👁 Gaze Feedback */}
@@ -100,17 +138,12 @@ export default function StrategyCoreShell() {
         <GazeEyes />
       </div>
 
-      {/* 💬 Typing Input */}
       <TypingPanel />
-
-      {/* 🧠 System Overlay */}
       <InstitutionalOverlay />
-
-      {/* 🔄 Mutation Display */}
       <MutationOverlay />
 
-      {/* 📈 Market Strip */}
-      <div className="pointer-events-none absolute bottom-2 w-full flex justify-center z-20">
+      {/* 📈 Financial Ticker */}
+      <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
     </div>
