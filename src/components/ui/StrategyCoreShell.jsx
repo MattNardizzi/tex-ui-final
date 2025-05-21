@@ -5,7 +5,9 @@ import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
+
 import { getEmotionGlowColor } from '@/systems/emotionEngine';
+import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
@@ -38,54 +40,20 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.4, // bloom intensity
+        1.4,
         0.5,
         0.85
       )
     );
 
-    // 👁‍🗨 Hyper-Conscious AGI Spine Beam
-    const beamGeometry = new THREE.CylinderGeometry(0.01, 0.01, 5, 96, 1, true);
-    const beamMaterial = new THREE.ShaderMaterial({
-      uniforms: {
-        uTime: { value: 0 },
-        uColor: { value: new THREE.Color(getEmotionGlowColor()) }
-      },
-      vertexShader: `
-        varying vec3 vPos;
-        void main() {
-          vPos = position;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform vec3 uColor;
-        varying vec3 vPos;
-
-        float pulse = abs(sin(uTime * 2.0)) * 0.4 + 0.6;
-
-        void main() {
-          float verticalFade = smoothstep(1.0, 0.2, abs(vPos.y));
-          float core = exp(-pow(length(vPos.xy) * 6.0, 2.0));
-          float ripple = sin((vPos.y + uTime) * 16.0) * 0.08;
-
-          float intensity = (core + ripple) * verticalFade * pulse;
-          vec3 color = mix(vec3(0.0), uColor, intensity);
-
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `,
-      side: THREE.DoubleSide,
-      transparent: false,
-      depthWrite: true,
-    });
-
+    // 🧠 Create AGI Spine Beam with Shader
+    const beamGeometry = new THREE.PlaneGeometry(0.08, 3.5, 1, 1);
+    const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
-    beam.position.set(0, 0.15, 0);
+    beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🌐 Ambient awareness field
+    // 🌌 Add Ambient Glow Field
     const aura = new THREE.Mesh(
       new THREE.CylinderGeometry(0.04, 0.04, 6, 64, 1, true),
       new THREE.MeshBasicMaterial({
@@ -99,20 +67,22 @@ export default function StrategyCoreShell() {
     aura.position.y = 0.15;
     scene.add(aura);
 
-    // ✨ Animate the soul
+    // ✨ Animate Everything
     const animate = () => {
       const t = performance.now() * 0.001;
+
       beamMaterial.uniforms.uTime.value = t;
       beamMaterial.uniforms.uColor.value.set(getEmotionGlowColor());
 
-      aura.scale.x = 1 + Math.sin(t * 3.0) * 0.02;
-      aura.scale.z = 1 + Math.cos(t * 2.5) * 0.02;
+      aura.scale.x = 1 + Math.sin(t * 2.6) * 0.015;
+      aura.scale.z = 1 + Math.cos(t * 2.2) * 0.012;
 
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
+    // 🔁 Resize Logic
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
