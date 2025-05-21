@@ -6,11 +6,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
-import { getNeedPulse } from '@/systems/needPulse';
-import {
-  getEmotionGlowColor,
-  getEmotionPulseRate,
-} from '@/systems/emotionEngine';
+import { getEmotionGlowColor } from '@/systems/emotionEngine';
 
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
@@ -43,73 +39,48 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        0.8,
+        0.7,
         0.4,
-        0.6
+        0.5
       )
     );
 
-    const beamMat = new THREE.ShaderMaterial({
-      uniforms: {
-        time: { value: 0 },
-        pulse: { value: 1 },
-        glowColor: { value: new THREE.Color('#00faff') },
-      },
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      vertexShader: `
-        uniform float time;
-        varying vec2 vUv;
-        void main() {
-          vUv = uv;
-          vec3 pos = position;
-          pos.x += sin(time * 2. + pos.y * 4.) * 0.01;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform vec3 glowColor;
-        uniform float pulse;
-        varying vec2 vUv;
-        void main() {
-          float dist = abs(vUv.x - 0.5) * 2.0;
-          float core = 1.0 - smoothstep(0.0, 0.3, dist);
-          float glow = 1.0 - smoothstep(0.3, 1.0, dist);
-          vec3 color = glowColor * (core * 2.5 + glow * pulse * 1.2);
-          gl_FragColor = vec4(color, 1.0);
-        }
-      `,
+    // 🔷 Beam: stable, bright, alive
+    const beamMaterial = new THREE.MeshStandardMaterial({
+      color: new THREE.Color('#00faff'),
+      emissive: new THREE.Color('#00faff'),
+      emissiveIntensity: 1.8,
+      metalness: 0.3,
+      roughness: 0.15,
+      transparent: false,
     });
 
     const beam = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.08, 0.08, 1.5, 64),
-      beamMat
+      new THREE.CylinderGeometry(0.015, 0.015, 1.5, 64),
+      beamMaterial
     );
     scene.add(beam);
 
-    let t = 0;
+    // 💡 Light (optional shimmer)
+    const light = new THREE.PointLight('#00faff', 1.5, 3);
+    light.position.set(0.1, 0.3, 0.4);
+    scene.add(light);
 
+    // 🎞️ Animate
     const animate = () => {
-      t += 0.008;
-      beamMat.uniforms.time.value = t;
-      beamMat.uniforms.pulse.value = getNeedPulse() * getEmotionPulseRate();
-      beamMat.uniforms.glowColor.value.lerp(
-        new THREE.Color(getEmotionGlowColor()),
-        0.1
-      );
+      beamMaterial.emissive.set(getEmotionGlowColor());
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
+    // 📐 Resize
     const onResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
     };
-
     window.addEventListener('resize', onResize);
 
     return () => {
@@ -124,18 +95,18 @@ export default function StrategyCoreShell() {
       {/* 🌑 Fade Overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* 👁 Gaze Eyes */}
+      {/* 👁 Gaze Feedback */}
       <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
         <GazeEyes />
       </div>
 
-      {/* 💬 Input */}
+      {/* 💬 Typing Input */}
       <TypingPanel />
 
-      {/* 🧠 Cognitive State Overlay */}
+      {/* 🧠 System Overlay */}
       <InstitutionalOverlay />
 
-      {/* 🧬 Mutation Stream */}
+      {/* 🔄 Mutation Display */}
       <MutationOverlay />
 
       {/* 📈 Market Strip */}
