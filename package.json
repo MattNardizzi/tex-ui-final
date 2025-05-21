@@ -9,6 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "^10.0.8",
+    "@react-three/fiber": "^9.1.2",
+    "drei": "^2.2.21",
     "next": "15.3.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
