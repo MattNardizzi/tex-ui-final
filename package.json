@@ -10,17 +10,19 @@
   },
   "dependencies": {
     "next": "15.3.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "three": "^0.176.0",
     "simplex-noise": "^4.0.3",
-    "three": "^0.176.0"
+    "@react-three/fiber": "^9.1.2",
+    "@react-three/drei": "^9.91.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "tailwindcss": "^4",
