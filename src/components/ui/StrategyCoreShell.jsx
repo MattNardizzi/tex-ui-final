@@ -30,7 +30,12 @@ export default function StrategyCoreShell() {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
 
-    const camera = new THREE.PerspectiveCamera(58, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      58,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
     camera.position.set(0, 0.12, 3.4);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -41,7 +46,12 @@ export default function StrategyCoreShell() {
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
-      new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.55, 0.25, 0.75)
+      new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        0.55,
+        0.25,
+        0.75
+      )
     );
 
     const beamMat = new THREE.ShaderMaterial({
@@ -96,7 +106,8 @@ export default function StrategyCoreShell() {
       beamMat.uniforms.glowColor.value.lerp(glowTarget, 0.05);
 
       beam.scale.set(1 + smooth * 0.15, 1, 1);
-      beam.position.x = Math.sin(t * 1.1) * 0.008 + noise2D(t * 0.3, 0) * 0.003;
+      beam.position.x =
+        Math.sin(t * 1.1) * 0.008 + noise2D(t * 0.3, 0) * 0.003;
 
       animateHooks.forEach((fn) => fn(t));
       composer.render();
@@ -110,6 +121,7 @@ export default function StrategyCoreShell() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
     };
+
     window.addEventListener('resize', onResize);
 
     return () => {
@@ -121,21 +133,21 @@ export default function StrategyCoreShell() {
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* 🌑 Fade Overlay */}
+      {/* 🌑 Visual Mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* 👁 Gaze Eyes */}
+      {/* 👁️ Gaze Feedback */}
       <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
         <GazeEyes />
       </div>
 
-      {/* 💬 Typing Input */}
+      {/* 💬 User Input */}
       <TypingPanel />
 
-      {/* 🧠 State Overlay */}
+      {/* 🧠 Status Display */}
       <InstitutionalOverlay />
 
-      {/* 🔄 Mutation Feed */}
+      {/* 🧬 Mutation Log */}
       <MutationOverlay />
 
       {/* 📈 Market Ticker */}
