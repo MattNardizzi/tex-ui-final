@@ -47,10 +47,10 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 0, 0]} // ✅ Centered perfectly
-      rotation-x={-Math.PI / 2} // ✅ Vertical beam into Z space
+      position={[0, 1.1, 0]} // ✅ Lifted above footer HUD
+      rotation-x={-Math.PI / 2}
     >
-      <planeGeometry args={[0.075, 2.4]} />
+      <planeGeometry args={[0.085, 2.6]} />
       <shaderMaterial
         ref={materialRef}
         args={[createSpineShaderMaterial(getEmotionGlowColor())]}
@@ -62,7 +62,7 @@ function SpineBeam() {
 
 function CoreRing() {
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -1.2, 0]}>
+    <mesh rotation-x={-Math.PI / 2} position={[0, -0.25, 0]}>
       <ringGeometry args={[0.1, 0.17, 64]} />
       <meshBasicMaterial
         color={new THREE.Color('#00faff')}
@@ -77,27 +77,28 @@ function CoreRing() {
 export default function StrategyCoreShell() {
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* Top/bottom fade mask */}
+      {/* Fade Mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* Canvas */}
-      <Canvas
-        gl={{ antialias: true, alpha: true }}
-        dpr={[1, 2]}
-        camera={{ position: [0, 0.1, 3.2], fov: 60 }}
-      >
-        <PerspectiveCamera makeDefault position={[0, 0.1, 3.2]} />
-        <ambientLight intensity={0.1} />
-        <SpineBeam />
-        <CoreRing />
-      </Canvas>
+      {/* Canvas Scene */}
+      <div className="absolute inset-0 z-0">
+        <Canvas
+          gl={{ antialias: true, alpha: true }}
+          dpr={[1, 2]}
+          camera={{ position: [0, 1.1, 3.2], fov: 60 }}
+        >
+          <PerspectiveCamera makeDefault position={[0, 1.1, 3.2]} />
+          <ambientLight intensity={0.1} />
+          <SpineBeam />
+          <CoreRing />
+        </Canvas>
+      </div>
 
-      {/* AGI UI */}
+      {/* UI Layers */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* Market Ticker */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
