@@ -30,10 +30,10 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.3, 0]}               // Horizontal bar at center
-      rotation-x={-Math.PI / 2}           // ✅ Flat and facing camera
+      position={[0, 1.3, 0]}
+      rotation={[0, 0, 0]} // ✅ upright beam
     >
-      <planeGeometry args={[1.4, 0.02]} /> {/* ✅ Wide and thin */}
+      <planeGeometry args={[0.12, 3.2]} />
     </mesh>
   );
 }
