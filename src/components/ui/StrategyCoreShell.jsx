@@ -49,10 +49,10 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 1.3, 0]} // ✅ Visible in center frame
+      position={[0, 1.3, 0]} // Center beam in view
       rotation-x={-Math.PI / 2}
     >
-      <planeGeometry args={[0.1, 3.2]} />
+      <planeGeometry args={[0.12, 3.2]} /> {/* Slightly thicker beam */}
       <shaderMaterial
         ref={materialRef}
         args={[createSpineShaderMaterial(getEmotionGlowColor())]}
@@ -73,7 +73,11 @@ function CoreRing() {
   });
 
   return (
-    <mesh ref={meshRef} rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
+    <mesh
+      ref={meshRef}
+      rotation-x={-Math.PI / 2}
+      position={[0, -0.2, 0]} // Below the beam
+    >
       <ringGeometry args={[0.1, 0.17, 64]} />
       <shaderMaterial
         ref={materialRef}
