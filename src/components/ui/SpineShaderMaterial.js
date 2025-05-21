@@ -13,7 +13,13 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       void main() {
         vPosition = position;
         vUv = uv;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+
+        // taper width at top/bottom
+        float taper = 1.0 - smoothstep(0.9, 1.4, abs(position.y));
+        vec3 pos = position;
+        pos.x *= taper;
+
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
       }
     `,
     fragmentShader: `
@@ -28,23 +34,18 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       float fresnel(vec2 uv) {
         vec2 center = vec2(0.5, 0.5);
         float dist = length(uv - center);
-        return pow(1.0 - dist, 2.8); // tighter core
+        return pow(1.0 - dist, 2.5);
       }
 
       float verticalFade(float y) {
-        float fade = smoothstep(1.1, 0.1, abs(y));
-        return mix(0.4, 1.0, fade); // Always visible, fades near ends
+        float fade = smoothstep(1.4, 0.2, abs(y));
+        return mix(0.2, 1.0, fade);
       }
 
       void main() {
         float fadeY = verticalFade(vPosition.y);
-
-        // Slow breathing pattern
         float breath = 0.6 + 0.4 * sin(uTime * 1.2);
-
-        // Fast heartbeat pulse
         float heartbeat = 0.9 + 0.1 * sin(uTime * 7.5);
-
         float pulse = breath * heartbeat;
 
         float core = fresnel(vUv);
