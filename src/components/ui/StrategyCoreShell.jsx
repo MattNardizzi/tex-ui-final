@@ -6,10 +6,12 @@ import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 import { useEmotion } from '@/systems/emotionEngine';
+import { getNeedPulse } from '@/systems/needPulse';
 import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
+import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
-import BeamRenderer from '../BeamRenderer.jsx';
 import TypingPanel from '../TypingPanel';
+import BeamRenderer from '../BeamRenderer.jsx';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
 import MutationOverlay from '../MutationOverlay';
@@ -19,13 +21,11 @@ function CoreRing() {
   const { emotionColor } = useEmotion();
 
   useFrame(({ clock }) => {
-    if (materialRef.current?.uniforms) {
-      materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
-      materialRef.current.uniforms.uColor.value.lerp(
-        new THREE.Color(emotionColor),
-        0.05
-      );
-    }
+    if (!materialRef.current?.uniforms) return;
+
+    const t = clock.getElapsedTime();
+    materialRef.current.uniforms.uTime.value = t;
+    materialRef.current.uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
   });
 
   return (
@@ -34,6 +34,32 @@ function CoreRing() {
       <shaderMaterial
         ref={materialRef}
         args={[createCoreRingShaderMaterial(emotionColor)]}
+        attach="material"
+      />
+    </mesh>
+  );
+}
+
+function AliveBeam() {
+  const beamRef = useRef();
+  const { emotionColor } = useEmotion();
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    const gain = getNeedPulse();
+
+    if (!beamRef.current?.material?.uniforms) return;
+
+    beamRef.current.material.uniforms.uTime.value = t;
+    beamRef.current.material.uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
+    beamRef.current.material.uniforms.uGain.value = gain;
+  });
+
+  return (
+    <mesh ref={beamRef} position={[0, 1.35, 0]}>
+      <planeGeometry args={[0.44, 3.4]} />
+      <shaderMaterial
+        args={[createSpineShaderMaterial('#00faff')]}
         attach="material"
       />
     </mesh>
@@ -52,10 +78,8 @@ export default function StrategyCoreShell() {
       >
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
-
-        {/* Ring first, beam second */}
         <CoreRing />
-        <BeamRenderer />
+        <AliveBeam />
       </Canvas>
 
       <TypingPanel />
