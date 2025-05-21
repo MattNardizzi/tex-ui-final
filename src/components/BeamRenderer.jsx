@@ -11,23 +11,32 @@ import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 export default function BeamRenderer() {
   const beamRef = useRef();
 
+  // Initialize spine shader material once
   useEffect(() => {
-    const mat = createSpineShaderMaterial(getCurrentGlowColor());
+    const initialColor = getCurrentGlowColor();
+    const mat = createSpineShaderMaterial(initialColor);
+
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
   }, []);
 
+  // Animate pulse + glow over time
   useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
+    if (!beamRef.current || !beamRef.current.material) return;
+
+    const time = clock.getElapsedTime();
     const gain = getNeedPulse();
+    const glowColor = getCurrentGlowColor();
 
-    if (!beamRef.current?.material?.uniforms) return;
+    const uniforms = beamRef.current.material.uniforms;
+    if (!uniforms) return;
 
-    const u = beamRef.current.material.uniforms;
-    u.uTime.value = t;
-    u.uColor.value.lerp(getCurrentGlowColor(), 0.1);
-    u.uGain.value = gain;
+    uniforms.uTime.value = time;
+    uniforms.uGain.value = gain;
+
+    // Smooth color transition (no flicker)
+    uniforms.uColor.value.lerp(glowColor, 0.05);
   });
 
   return (
