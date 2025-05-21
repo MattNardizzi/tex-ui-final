@@ -20,9 +20,7 @@ function CoreRing() {
 
   useFrame(({ clock }) => {
     if (!materialRef.current?.uniforms) return;
-
-    const t = clock.getElapsedTime();
-    materialRef.current.uniforms.uTime.value = t;
+    materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
     materialRef.current.uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
   });
 
@@ -41,8 +39,6 @@ function CoreRing() {
 export default function StrategyCoreShell() {
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
-
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
@@ -51,7 +47,7 @@ export default function StrategyCoreShell() {
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
         <CoreRing />
-        <BeamRenderer /> {/* ✅ Now using upgraded dynamic spine */}
+        <BeamRenderer />
       </Canvas>
 
       <TypingPanel />
