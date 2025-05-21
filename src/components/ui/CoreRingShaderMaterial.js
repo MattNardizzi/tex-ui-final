@@ -21,14 +21,21 @@ export function createCoreRingShaderMaterial(emotionColor = '#00faff') {
 
       void main() {
         float dist = length(vUv - vec2(0.5));
-        float edgeFade = smoothstep(0.4, 0.25, dist); // outer softness
-        float coreRing = smoothstep(0.26, 0.22, dist) * (1.0 - smoothstep(0.22, 0.12, dist));
 
-        float pulse = 0.9 + 0.1 * sin(uTime * 3.0);
-        float glow = edgeFade * coreRing * pulse;
+        // Ring band with crisp inner + outer boundaries
+        float outer = smoothstep(0.3, 0.28, dist);
+        float inner = smoothstep(0.22, 0.2, dist);
+        float ring = outer * (1.0 - inner);
 
-        vec3 color = uColor * glow;
-        gl_FragColor = vec4(color, glow);
+        // Add pulsation to intensity
+        float pulse = 0.85 + 0.15 * sin(uTime * 2.5);
+        float intensity = ring * pulse;
+
+        vec3 color = uColor * intensity;
+
+        // Force alpha visibility, no ghost fade
+        float alpha = clamp(intensity + 0.35, 0.0, 1.0);
+        gl_FragColor = vec4(color, alpha);
       }
     `,
     side: THREE.DoubleSide,
