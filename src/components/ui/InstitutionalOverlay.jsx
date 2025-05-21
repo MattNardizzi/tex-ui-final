@@ -34,7 +34,6 @@ export default function InstitutionalOverlay() {
       </div>
     </div>
   );
-}'use client';
 
 import React, { useEffect, useState } from 'react';
 import { getEmotionName, getEmotionPulseRate, getEmotionGlowColor } from '@/systems/emotionEngine';
