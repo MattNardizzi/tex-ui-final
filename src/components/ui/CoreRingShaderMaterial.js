@@ -8,8 +8,14 @@ export function createCoreRingShaderMaterial(emotionColor = '#00faff') {
     },
     vertexShader: `
       varying vec2 vUv;
+      varying float vAngle;
+
       void main() {
         vUv = uv;
+
+        // Calculate angle for subtle spin
+        vAngle = atan(position.y, position.x);
+
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `,
@@ -19,25 +25,28 @@ export function createCoreRingShaderMaterial(emotionColor = '#00faff') {
       uniform vec3 uColor;
       uniform float uTime;
       varying vec2 vUv;
+      varying float vAngle;
 
       void main() {
-        float dist = length(vUv - vec2(0.5));
-        
-        // Core ring band definition
-        float outerEdge = smoothstep(0.3, 0.285, dist);
-        float innerEdge = smoothstep(0.22, 0.205, dist);
-        float ring = outerEdge * (1.0 - innerEdge);
+        // Distance from center
+        float dist = length(vUv - 0.5);
 
-        // Radial shimmer pulse
-        float wave = 0.5 + 0.5 * sin(uTime * 3.0 + dist * 20.0);
-        float pulse = 0.9 + 0.1 * sin(uTime * 2.0);
+        // Smooth ring band
+        float outer = smoothstep(0.3, 0.28, dist);
+        float inner = smoothstep(0.22, 0.20, dist);
+        float band = outer * (1.0 - inner);
 
-        float intensity = ring * wave * pulse;
+        // Spiral shimmer
+        float spiral = sin(vAngle * 12.0 + uTime * 3.0) * 0.5 + 0.5;
 
-        vec3 color = uColor * intensity;
+        // Flickering pulse
+        float pulse = 0.8 + 0.2 * sin(uTime * 4.0 + dist * 25.0);
 
-        // Stronger glow presence
-        float alpha = clamp(intensity * 2.2, 0.0, 1.0);
+        float glow = band * spiral * pulse;
+
+        vec3 color = uColor * glow * 1.8;
+
+        float alpha = clamp(glow, 0.0, 1.0);
         gl_FragColor = vec4(color, alpha);
       }
     `,
