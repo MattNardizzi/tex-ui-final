@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 
-export function createSpineShaderMaterial(emotionColor = '#00faff') {
+export function createSpineShaderMaterial(emotionColor = '#00ff88') {
   return new THREE.ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
       uColor: { value: new THREE.Color(emotionColor) },
-      uGain: { value: 1.0 }, // emotion multiplier
+      uGain: { value: 1.0 },
     },
     vertexShader: `
       varying float vY;
@@ -20,21 +20,20 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       uniform vec3 uColor;
       uniform float uTime;
       uniform float uGain;
-
       varying float vY;
 
       float taper(float y) {
-        return smoothstep(-2.5, -1.5, y) * smoothstep(1.5, 2.5, y);
+        return smoothstep(-4.0, -2.0, y) * smoothstep(2.0, 4.0, y);
       }
 
       float pulse(float y, float t) {
-        return 0.6 + 0.4 * sin(t * 2.0 + y * 10.0 + cos(y * 6.0));
+        return 0.8 + 0.25 * sin(t * 4.0 + y * 10.0 + cos(y * 5.0));
       }
 
       void main() {
-        float glow = taper(vY) * pulse(vY, uTime) * uGain;
-        vec3 color = uColor * glow;
-        gl_FragColor = vec4(color, clamp(glow, 0.2, 1.0));
+        float intensity = taper(vY) * pulse(vY, uTime) * uGain;
+        vec3 color = uColor * intensity;
+        gl_FragColor = vec4(color, clamp(intensity, 0.2, 1.0));
       }
     `,
     transparent: true,
