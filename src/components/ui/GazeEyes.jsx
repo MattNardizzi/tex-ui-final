@@ -1,48 +1,50 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
+import { getEmotionGlowColor } from '@/systems/emotionEngine';
 
-const GazeEyes = () => {
-  const [gazeActive, setGazeActive] = useState(false);
-  const eyesRef = useRef(null);
+export default function GazeEyes() {
+  const eyes = useRef([]);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      const eyes = eyesRef.current;
-      if (!eyes) return;
-
-      const rect = eyes.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-
-      const dx = e.clientX - centerX;
-      const dy = e.clientY - centerY;
-      const distance = Math.sqrt(dx * dx + dy * dy);
-
-      setGazeActive(distance < 100); // within 100px = "looking at"
+    const onMove = (e) => {
+      eyes.current.forEach((pupil) => {
+        const parent = pupil?.parentElement;
+        if (!parent) return;
+        const rect = parent.getBoundingClientRect();
+        const dx = e.clientX - (rect.left + rect.width / 2);
+        const dy = e.clientY - (rect.top + rect.height / 2);
+        const angle = Math.atan2(dy, dx);
+        const r = 4; // pupil travel radius
+        pupil.style.transform = `translate(${r * Math.cos(angle)}px, ${r * Math.sin(angle)}px)`;
+      });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
   }, []);
 
+  const glowColor = getEmotionGlowColor();
+
   return (
-    <div
-      ref={eyesRef}
-      className="flex gap-6 items-center justify-center transition-all duration-500"
-    >
+    <div className="flex justify-center gap-5 mb-2">
       {[0, 1].map((i) => (
         <div
           key={i}
-          className={`w-6 h-6 rounded-full transition-all duration-500 ${
-            gazeActive
-              ? 'bg-cyan-300 shadow-[0_0_15px_#00ffff,0_0_30px_#00ffff]'
-              : 'bg-gray-600 shadow-[0_0_4px_#222]'
-          }`}
-        />
+          className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center"
+          style={{
+            boxShadow: `0 0 10px ${glowColor}`,
+          }}
+        >
+          <div
+            ref={(el) => (eyes.current[i] = el)}
+            className="w-2 h-2 rounded-full transition-transform duration-150"
+            style={{
+              backgroundColor: glowColor,
+            }}
+          />
+        </div>
       ))}
     </div>
   );
-};
-
-export default GazeEyes;
+}
