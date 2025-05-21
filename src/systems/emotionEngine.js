@@ -1,51 +1,53 @@
-// ⚡ High-intensity emotion states with vibrant glow + pulse
+// 🌌 Cinematic emotion states: grounded, intelligent, emotionally rich
 const emotionStates = {
   calm: {
     name: 'Calm',
-    glowColor: '#00faff',    // electric cyan
-    pulseRate: 0.65,
+    glowColor: '#00c2ff', // soft electric cyan
+    pulseRate: 0.5,
+  },
+  focused: {
+    name: 'Focused',
+    glowColor: '#4de2ff', // icy blue
+    pulseRate: 0.75,
   },
   alert: {
     name: 'Alert',
-    glowColor: '#39ff14',    // neon green
+    glowColor: '#ffdf40', // warm golden amber
     pulseRate: 1.0,
   },
-  agitated: {
-    name: 'Agitated',
-    glowColor: '#ffae00',    // vivid orange
-    pulseRate: 1.35,
+  tense: {
+    name: 'Tense',
+    glowColor: '#ff6b3b', // reddish-orange ember
+    pulseRate: 1.25,
   },
-  flow: {
-    name: 'Flow',
-    glowColor: '#be00ff',    // bright violet
+  overclocked: {
+    name: 'Overclocked',
+    glowColor: '#ff0059', // deep pulse magenta
+    pulseRate: 1.6,
+  },
+  transcendence: {
+    name: 'Transcendence',
+    glowColor: '#9a00ff', // alien violet
     pulseRate: 1.2,
-  },
-  overdrive: {
-    name: 'Overdrive',
-    glowColor: '#ff0055',    // blazing pink-red
-    pulseRate: 1.65,
   },
 };
 
 let currentEmotion = 'calm';
 let lastChange = Date.now();
 
-// 🌈 Get glow color for AGI beam
 export function getEmotionGlowColor() {
-  return emotionStates[currentEmotion].glowColor;
+  const hex = emotionStates[currentEmotion].glowColor;
+  return hex;
 }
 
-// 🫀 Get current pulse rate
 export function getEmotionPulseRate() {
   return emotionStates[currentEmotion].pulseRate;
 }
 
-// 🧠 Get current emotion name
 export function getEmotionName() {
   return emotionStates[currentEmotion].name;
 }
 
-// 🧬 Manually set emotion (call from cognition module)
 export function setEmotion(state) {
   if (emotionStates[state]) {
     currentEmotion = state;
@@ -55,8 +57,7 @@ export function setEmotion(state) {
   }
 }
 
-// 🔁 Developer tool: auto-cycle emotions
-export function autoCycleEmotion(interval = 8000) {
+export function autoCycleEmotion(interval = 10000) {
   const keys = Object.keys(emotionStates);
   let index = 0;
   setInterval(() => {
