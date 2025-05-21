@@ -13,7 +13,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vec3 pos = position;
 
-        float taper = 1.0 - smoothstep(2.5, 3.6, abs(pos.y)); // strong taper spread
+        float taper = 1.0 - smoothstep(2.2, 3.6, abs(pos.y)); // softened + fuller
         pos.x *= taper;
 
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -29,19 +29,20 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
 
       float coreLine(vec2 uv) {
         float d = abs(uv.x - 0.5);
-        return 1.0 - smoothstep(0.015, 0.035, d); // slightly wider line
+        float edge = smoothstep(0.012, 0.028, d);       // slightly thicker center
+        float falloff = smoothstep(0.05, 0.08, d);      // outer soft glow
+        return (1.0 - edge) * (1.0 - falloff);
       }
 
       float verticalFade(vec2 uv) {
-        float top = pow(smoothstep(1.0, 0.6, uv.y), 2.0);
-        float bottom = pow(smoothstep(0.0, 0.35, uv.y), 2.0);
+        float top = pow(smoothstep(1.0, 0.5, uv.y), 2.2);
+        float bottom = pow(smoothstep(0.0, 0.3, uv.y), 2.2);
         return top * bottom;
       }
 
       float pulseShimmer(vec2 uv) {
-        float waveY = sin(uTime * 2.8 + uv.y * 15.0);
-        float waveX = cos(uTime * 1.5 + uv.x * 10.0);
-        return 0.9 + 0.1 * (waveY * waveX);
+        float wave = sin(uTime * 3.0 + uv.y * 20.0 + cos(uv.x * 25.0 + uTime * 0.5));
+        return 0.88 + 0.15 * wave;
       }
 
       void main() {
@@ -49,10 +50,10 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         float fade = verticalFade(vUv);
         float pulse = pulseShimmer(vUv);
 
-        float intensity = line * fade * pulse * uGain * 2.2; // 🔥 stronger presence
+        float intensity = line * fade * pulse * uGain * 2.3;
         vec3 color = uColor * intensity;
 
-        gl_FragColor = vec4(color, clamp(intensity, 0.7, 1.0));
+        gl_FragColor = vec4(color, clamp(intensity, 0.75, 1.0));
       }
     `,
     transparent: true,
