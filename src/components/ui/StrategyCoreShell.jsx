@@ -19,15 +19,15 @@ import FinanceTicker from './FinanceTicker';
 import MutationOverlay from '../MutationOverlay';
 
 export default function StrategyCoreShell() {
-  const mount = useRef(null);
-  const lastEmotion = useRef(getEmotionName());
+  const mountRef = useRef(null);
+  const lastEmotionRef = useRef(getEmotionName());
 
   useEffect(() => {
-    // 🎬 Create scene
+    // 🧠 Scene setup
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
 
-    // 🎥 Setup camera
+    // 🎥 Camera config
     const camera = new THREE.PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
@@ -36,48 +36,46 @@ export default function StrategyCoreShell() {
     );
     camera.position.set(0, 0.1, 3.2);
 
-    // 🌐 WebGL renderer
+    // ⚙️ Renderer setup
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    mount.current.appendChild(renderer.domElement);
+    mountRef.current.appendChild(renderer.domElement);
 
-    // ✨ Postprocessing
+    // ✨ Bloom postprocessing
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.3,
-        0.4,
-        0.65
+        1.3, 0.4, 0.65
       )
     );
 
-    // 🧠 Create spine
+    // 🌐 Create core spine beam
     const beamGeometry = new THREE.PlaneGeometry(0.07, 2.75, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
-    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
-    beam.rotation.y = Math.PI;
-    scene.add(beam);
+    const beamMesh = new THREE.Mesh(beamGeometry, beamMaterial);
+    beamMesh.rotation.y = Math.PI;
+    scene.add(beamMesh);
 
-    // 🔁 Auto emotion loop
+    // 🔁 Start auto-cycling emotion loop
     autoCycleEmotion(10000);
 
-    // 🎞️ Animate frame
+    // 🌀 Animate shader
     const animate = () => {
-      const t = performance.now() * 0.001;
-      beamMaterial.uniforms.uTime.value = t;
+      const now = performance.now() * 0.001;
+      beamMaterial.uniforms.uTime.value = now;
 
       const currentEmotion = getEmotionName();
-      const targetColor = getEmotionGlowColor();
-      const colorUniform = beamMaterial.uniforms.uColor.value;
+      const newColor = getEmotionGlowColor();
+      const activeColor = beamMaterial.uniforms.uColor.value;
 
-      if (lastEmotion.current !== currentEmotion) {
-        lastEmotion.current = currentEmotion;
-        colorUniform.lerp(targetColor, 0.1);
+      if (lastEmotionRef.current !== currentEmotion) {
+        lastEmotionRef.current = currentEmotion;
+        activeColor.lerp(newColor, 0.1);
       } else {
-        colorUniform.lerp(targetColor, 0.04);
+        activeColor.lerp(newColor, 0.04);
       }
 
       composer.render();
@@ -85,37 +83,39 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 📐 Resize listener
+    // 🧩 Resize logic
     const handleResize = () => {
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      composer.setSize(window.innerWidth, window.innerHeight);
-      camera.aspect = window.innerWidth / window.innerHeight;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      renderer.setSize(width, height);
+      composer.setSize(width, height);
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
     };
     window.addEventListener('resize', handleResize);
 
-    // 🧼 Cleanup
+    // 🧼 Cleanup on unmount
     return () => {
       window.removeEventListener('resize', handleResize);
-      mount.current.removeChild(renderer.domElement);
+      mountRef.current.removeChild(renderer.domElement);
       renderer.dispose();
     };
   }, []);
 
   return (
     <div
-      ref={mount}
+      ref={mountRef}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
-      {/* Fade Overlay */}
+      {/* Top/Bottom shader mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* Cognitive UI */}
+      {/* Modular overlays */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* HUD */}
+      {/* Market HUD */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
