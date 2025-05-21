@@ -3,13 +3,12 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { createSpineShaderMaterial } from './ui/SpineShaderMaterial'; // ✅ Correct path
+import { useEmotion } from '@/systems/emotionEngine';
+import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 
 export default function BeamRenderer() {
   const beamRef = useRef();
-
-  // ✅ Fallback color while useEmotion is unavailable
-  const emotionColor = '#00faff';
+  const { emotionColor } = useEmotion();
 
   useEffect(() => {
     if (beamRef.current) {
@@ -31,7 +30,7 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.3, 0]}
+      position={[0, 1.6, 0]} // ✅ Raised to float above the ring
       rotation={[0, 0, 0]}
     >
       <planeGeometry args={[0.12, 3.2]} />
