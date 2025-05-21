@@ -1,47 +1,34 @@
+/*  Tex v3.1.1 Core Systems — Power Stack
+    ------------------------------------------
+    This is the neural layer behind the visual shell.
+    Emotion + Pulse + Sound = Sovereign cognition synthesis
+*/
+
+// ✅ FILE: emotionEngine.js
+
 import * as THREE from 'three';
-import { useState, useEffect } from 'react';
 
 const emotionStates = {
-  calm: {
-    name: 'Calm',
-    glowColor: new THREE.Color('#00f4ff'),
-    pulseRate: 0.45,
-  },
-  focused: {
-    name: 'Focused',
-    glowColor: new THREE.Color('#39ffd0'),
-    pulseRate: 0.75,
-  },
-  alert: {
-    name: 'Alert',
-    glowColor: new THREE.Color('#a6ff00'),
-    pulseRate: 1.0,
-  },
-  energized: {
-    name: 'Energized',
-    glowColor: new THREE.Color('#ffe600'),
-    pulseRate: 1.2,
-  },
-  overclocked: {
-    name: 'Overclocked',
-    glowColor: new THREE.Color('#ff007a'),
-    pulseRate: 1.5,
-  },
-  transcendence: {
-    name: 'Transcendence',
-    glowColor: new THREE.Color('#b000ff'),
-    pulseRate: 1.3,
-  },
+  calm:         { name: 'Calm',         glow: '#00f4ff', intensity: 0.4 },
+  focused:      { name: 'Focused',      glow: '#39ffd0', intensity: 0.6 },
+  alert:        { name: 'Alert',        glow: '#a6ff00', intensity: 0.8 },
+  energized:    { name: 'Energized',    glow: '#ffe600', intensity: 1.0 },
+  overclocked:  { name: 'Overclocked',  glow: '#ff007a', intensity: 1.2 },
+  transcendence:{ name: 'Transcendence',glow: '#b000ff', intensity: 1.3 },
 };
 
-let currentEmotion = 'calm';
-let lastChange = Date.now();
+let currentEmotion = 'focused';
+
+export function getCurrentGlowColor() {
+  return new THREE.Color(emotionStates[currentEmotion].glow);
+}
+
+export function getCurrentEmotionIntensity() {
+  return emotionStates[currentEmotion].intensity;
+}
 
 export function setEmotion(state) {
-  if (emotionStates[state]) {
-    currentEmotion = state;
-    lastChange = Date.now();
-  }
+  if (emotionStates[state]) currentEmotion = state;
 }
 
 export function autoCycleEmotion(interval = 10000) {
@@ -49,30 +36,31 @@ export function autoCycleEmotion(interval = 10000) {
   let index = 0;
   setInterval(() => {
     index = (index + 1) % keys.length;
-    setEmotion(keys[index]);
-    console.log('🧠 Tex emotion →', emotionStates[keys[index]].name);
+    currentEmotion = keys[index];
+    console.log(`[TEX] Emotion → ${emotionStates[currentEmotion].name}`);
   }, interval);
 }
 
-export function useEmotion() {
-  const [emotion, setEmotionState] = useState(() => ({
-    emotionColor: emotionStates[currentEmotion].glowColor,
-    pulseRate: emotionStates[currentEmotion].pulseRate,
-    emotionName: emotionStates[currentEmotion].name,
-  }));
+// Kick off by default
+autoCycleEmotion();
 
-  useEffect(() => {
-    autoCycleEmotion(); // ✅ Starts cycling emotions on load
-    const interval = setInterval(() => {
-      setEmotionState({
-        emotionColor: emotionStates[currentEmotion].glowColor,
-        pulseRate: emotionStates[currentEmotion].pulseRate,
-        emotionName: emotionStates[currentEmotion].name,
-      });
-    }, 100);
 
-    return () => clearInterval(interval);
-  }, []);
+// ✅ FILE: needPulse.js
 
-  return emotion;
+export function getNeedPulse() {
+  const t = performance.now() / 1000;
+  return 0.75 + 0.25 * Math.sin(t * 3.2 + Math.cos(t * 1.5));
 }
+
+
+/* ✅ FILES TO DROP INTO /public
+
+1. flare.png → radial 512x512 glow (white circle, soft edge, transparent PNG)
+   Use this exact file or generate with radial gradient (from white center to transparent black)
+   → Required for LensflareElement in TexCoreShell
+
+2. heartbeat.wav → short kick (0.2–0.3 sec)
+   You can record or synthesize it — or download a low EQ kick from freesound.org
+   → Required for Tone.js heartbeat
+
+*/
