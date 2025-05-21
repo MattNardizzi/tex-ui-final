@@ -10,14 +10,12 @@ export default function BeamRenderer() {
   const beamRef = useRef();
   const { emotionColor } = useEmotion();
 
-  // Set material on mount and update on emotion change
   useEffect(() => {
     if (beamRef.current) {
       beamRef.current.material = createSpineShaderMaterial(emotionColor);
     }
   }, [emotionColor]);
 
-  // Animate beam pulse and color shift
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
 
@@ -29,7 +27,6 @@ export default function BeamRenderer() {
 
     beamRef.current.material.uniforms.uTime.value = t;
 
-    // Smooth color blend
     beamRef.current.material.uniforms.uColor.value.lerp(
       new THREE.Color(emotionColor),
       0.05
@@ -39,10 +36,10 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.2, 0]} // ↕️ Height above ring
+      position={[0, 1.25, 0]} // Slightly raised to ensure ring visibility
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.28, 3.2]} />
+      <planeGeometry args={[0.2, 3.4]} /> {/* Tightened width for sharper beam */}
     </mesh>
   );
 }
