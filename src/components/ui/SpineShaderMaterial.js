@@ -24,28 +24,23 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
 
       float fresnel(vec2 uv) {
         float d = length(uv - vec2(0.5));
-        return pow(1.0 - d, 12.0); // sharp bright core
-      }
-
-      float bodyGlow(vec2 uv) {
-        float d = abs(uv.x - 0.5);
-        return pow(1.0 - d, 2.0) * 0.15;
+        return pow(1.0 - d, 16.0); // crisper core beam
       }
 
       float verticalFade(vec2 uv) {
-        float top = smoothstep(0.98, 0.45, uv.y);
+        float top = smoothstep(0.98, 0.4, uv.y);
         float bottom = smoothstep(0.02, 0.5, uv.y);
         return top * bottom;
       }
 
       void main() {
-        float pulse = 0.7 + 0.3 * sin(uTime * 1.2);
+        float pulse = 0.85 + 0.15 * sin(uTime * 1.5);
         float fade = verticalFade(vUv);
         float core = fresnel(vUv);
-        float glow = bodyGlow(vUv);
-        float intensity = (core + glow) * fade * pulse;
+        float intensity = core * fade * pulse;
+
         vec3 color = uColor * intensity;
-        gl_FragColor = vec4(color, 0.12 + intensity);
+        gl_FragColor = vec4(color, 0.2 + intensity * 0.8);
       }
     `,
     side: THREE.DoubleSide,
