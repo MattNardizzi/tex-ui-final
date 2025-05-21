@@ -22,7 +22,7 @@ export default function StrategyCoreShell() {
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // Sovereign black void
+    scene.background = new THREE.Color(0x000000); // pure black background
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -42,38 +42,37 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.2, // Bloom intensity
+        1.35, // stronger bloom for sovereign glow
         0.4,
-        0.7
+        0.6
       )
     );
 
-    // 🧠 Create Spine
-    const beamGeometry = new THREE.PlaneGeometry(0.045, 3.0, 1, 1);
+    // 🧠 Create spine mesh (shortened for cinematic balance)
+    const beamGeometry = new THREE.PlaneGeometry(0.05, 2.6, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Auto cycle emotions for demo (optional)
-    autoCycleEmotion(10000); // Change emotion every 10 sec
+    // 🔁 Auto-cycle through emotional states
+    autoCycleEmotion(10000); // changes every 10 seconds
 
     // 🔄 Animate
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
 
-      // Smoothly transition to new emotion color
+      // Smooth transition toward target color
       const current = beamMaterial.uniforms.uColor.value;
-      const target = getEmotionGlowColor(); // THREE.Color from emotionEngine
-      current.lerp(target, 0.05); // Smooth blend
+      const target = getEmotionGlowColor(); // now returns THREE.Color
+      current.lerp(target, 0.06);
 
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
-    // 📐 Handle Resize
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
