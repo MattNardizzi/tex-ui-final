@@ -3,6 +3,9 @@
 import React, { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
+import * as THREE from 'three';
+
+import { useEmotion } from '@/systems/emotionEngine';
 import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
 
 import BeamRenderer from '../BeamRenderer.jsx';
@@ -13,19 +16,24 @@ import MutationOverlay from '../MutationOverlay';
 
 function CoreRing() {
   const materialRef = useRef();
+  const { emotionColor } = useEmotion();
 
   useFrame(({ clock }) => {
-    if (materialRef.current) {
+    if (materialRef.current?.uniforms) {
       materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+      materialRef.current.uniforms.uColor.value.lerp(
+        new THREE.Color(emotionColor),
+        0.04
+      );
     }
   });
 
   return (
     <mesh rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
-      <ringGeometry args={[0.12, 0.24, 128]} /> {/* ⬅️ Better resolution & glow body */}
+      <ringGeometry args={[0.12, 0.24, 128]} />
       <shaderMaterial
         ref={materialRef}
-        args={[createCoreRingShaderMaterial('#00faff')]}
+        args={[createCoreRingShaderMaterial(emotionColor)]}
         attach="material"
       />
     </mesh>
@@ -46,9 +54,11 @@ export default function StrategyCoreShell() {
         <BeamRenderer />
         <CoreRing />
       </Canvas>
+
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
+
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
