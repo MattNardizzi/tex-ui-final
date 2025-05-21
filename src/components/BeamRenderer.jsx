@@ -24,15 +24,15 @@ export default function BeamRenderer() {
 
     if (!beamRef.current?.material?.uniforms) return;
 
-    const uniforms = beamRef.current.material.uniforms;
-    uniforms.uTime.value = t;
-    uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.1);
-    uniforms.uGain.value = gain;
+    const u = beamRef.current.material.uniforms;
+    u.uTime.value = t;
+    u.uColor.value.lerp(new THREE.Color(emotionColor), 0.1);
+    u.uGain.value = gain;
   });
 
   return (
-    <mesh ref={beamRef} position={[0, 1.35, 0]}>
-      <cylinderGeometry args={[0.01, 0.01, 3.4, 32, 1, true]} />
+    <mesh ref={beamRef} position={[0, 0, 0]}>
+      <cylinderGeometry args={[0.012, 0.012, 8.4, 64, 1, true]} />
     </mesh>
   );
 }
