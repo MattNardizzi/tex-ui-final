@@ -45,11 +45,11 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         float fade = verticalFade(vUv);
         float pulse = pulseMod();
 
-        float intensity = line * fade * pulse;
+        float intensity = line * fade * pulse * 1.2;
         vec3 color = uColor * intensity;
 
-        // FORCE sharp beam: kill all blur by matching alpha to intensity
-        gl_FragColor = vec4(color, clamp(intensity, 0.4, 1.0));
+        // Final clamp for alpha control
+        gl_FragColor = vec4(color, clamp(intensity, 0.6, 1.0));
       }
     `,
     transparent: true,
