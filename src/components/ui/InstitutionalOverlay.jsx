@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getEmotionName, getEmotionPulseRate, getEmotionGlowColor } from '@/systems/emotionEngine';
+import { useEmotion } from '@/systems/emotionEngine';
 import { getNeedPulse } from '@/systems/needPulse';
 
 export default function InstitutionalOverlay() {
