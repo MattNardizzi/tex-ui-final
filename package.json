@@ -9,16 +9,15 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@react-three/drei": "^10.0.8",
+    "@react-three/drei": "^9.91.3",
     "@react-three/fiber": "^9.1.2",
     "drei": "^2.2.21",
     "next": "15.3.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "three": "^0.176.0",
     "simplex-noise": "^4.0.3",
-    "@react-three/fiber": "^9.1.2",
-    "@react-three/drei": "^9.91.3"
+    "three": "^0.176.0",
+    "tone": "^15.1.22"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
