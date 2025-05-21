@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react";
+import * as React from "react";
+import { useEffect, useState } from "react";
 import getNeedPulse from "../../systems/getNeedPulse";
 import emotionEngine, { getEmotionLabel } from "../../systems/emotionEngine";
+
 
 export default function StatusHUD() {
   const [pulse, setPulse] = useState(0.2);
