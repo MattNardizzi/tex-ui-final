@@ -47,10 +47,10 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 0.3, 0]} // ✅ Cleaned vertical center
+      position={[0, 1.3, 0]} // ✅ Centered
       rotation-x={-Math.PI / 2}
     >
-      <planeGeometry args={[0.085, 2.6]} />
+      <planeGeometry args={[0.1, 3.2]} /> {/* ✅ Thicker + taller */}
       <shaderMaterial
         ref={materialRef}
         args={[createSpineShaderMaterial(getEmotionGlowColor())]}
@@ -62,7 +62,7 @@ function SpineBeam() {
 
 function CoreRing() {
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -0.9, 0]}>
+    <mesh rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
       <ringGeometry args={[0.1, 0.17, 64]} />
       <meshBasicMaterial
         color={new THREE.Color('#00faff')}
@@ -82,9 +82,9 @@ export default function StrategyCoreShell() {
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        camera={{ position: [0, 0.5, 3.2], fov: 60 }} // ✅ Camera tilted slightly upward
+        camera={{ position: [0, 1.1, 4.2], fov: 60 }} // ✅ More balanced distance
       >
-        <PerspectiveCamera makeDefault position={[0, 0.5, 3.2]} />
+        <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
         <SpineBeam />
         <CoreRing />
