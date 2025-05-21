@@ -7,14 +7,15 @@ import { getNeedPulse } from '@/systems/needPulse';
 export default function InstitutionalOverlay() {
   const [mounted, setMounted] = useState(false);
 
+  // ✅ Always call hooks first
+  const { emotionColor, emotionName, pulseRate } = useEmotion();
+  const pulse = getNeedPulse()?.toFixed(2) || '0.00';
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
-
-  const { emotionColor, emotionName, pulseRate } = useEmotion();
-  const pulse = getNeedPulse()?.toFixed(2) || '0.00';
+  if (!mounted) return null; // ✅ Delay render, but keep hooks active
 
   return (
     <div
