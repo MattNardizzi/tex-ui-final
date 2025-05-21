@@ -8,7 +8,7 @@ import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
 export default function BeamRenderer() {
   const beamRef = useRef();
-  const { emotionColor, pulseLevel } = useEmotion();
+  const { emotionColor } = useEmotion();
 
   useEffect(() => {
     if (beamRef.current) {
@@ -17,12 +17,11 @@ export default function BeamRenderer() {
   }, [emotionColor]);
 
   useFrame(({ clock }) => {
-    if (!beamRef.current || !beamRef.current.material) return;
+    if (!beamRef.current?.material) return;
 
     const t = clock.getElapsedTime();
     beamRef.current.material.uniforms.uTime.value = t;
 
-    // Gradual emotion color blending
     beamRef.current.material.uniforms.uColor.value.lerp(
       new THREE.Color(emotionColor),
       0.04
@@ -32,8 +31,8 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.3, 0]}
-      rotation-x={-Math.PI / 2}
+      position={[0, 1.3, 0]} // ✅ Keep centered
+      rotation={[0, 0, 0]}   // ✅ Remove incorrect X rotation
     >
       <planeGeometry args={[0.12, 3.2]} />
     </mesh>
