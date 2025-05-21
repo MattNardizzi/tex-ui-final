@@ -14,7 +14,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vPosition = position;
         vUv = uv;
 
-        // taper width at top/bottom
+        // Taper width near top and bottom
         float taper = 1.0 - smoothstep(0.9, 1.4, abs(position.y));
         vec3 pos = position;
         pos.x *= taper;
@@ -31,27 +31,29 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       uniform vec3 uColor;
       uniform float uTime;
 
+      // Core glow falloff from beam center
       float fresnel(vec2 uv) {
-        vec2 center = vec2(0.5, 0.5);
-        float dist = length(uv - center);
-        return pow(1.0 - dist, 2.8); // tighter core
+        float dist = length(uv - vec2(0.5));
+        return pow(1.0 - dist, 2.8);
       }
 
+      // Smooth fade into black at top and bottom
       float verticalFade(vec2 uv) {
-        float top = smoothstep(1.0, 0.6, uv.y);
-        float bottom = smoothstep(0.0, 0.4, uv.y);
+        float top = smoothstep(1.0, 0.65, uv.y);
+        float bottom = smoothstep(0.0, 0.35, uv.y);
         return top * bottom;
       }
 
       void main() {
         float fadeY = verticalFade(vUv);
 
-        float breath = 0.6 + 0.4 * sin(uTime * 1.2);
-        float heartbeat = 0.9 + 0.1 * sin(uTime * 7.5);
+        // Breath = slow modulation, Heartbeat = fast pulse
+        float breath = 0.6 + 0.4 * sin(uTime * 1.1);
+        float heartbeat = 0.92 + 0.08 * sin(uTime * 7.5);
         float pulse = breath * heartbeat;
 
-        float core = fresnel(vUv);
-        float intensity = core * fadeY * pulse;
+        float coreGlow = fresnel(vUv);
+        float intensity = coreGlow * fadeY * pulse;
 
         vec3 color = uColor * intensity;
         gl_FragColor = vec4(color, intensity);
