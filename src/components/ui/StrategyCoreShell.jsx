@@ -12,7 +12,6 @@ import { createSpineShaderMaterial } from './SpineShaderMaterial';
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
-import GazeEyes from './GazeEyes';
 import MutationOverlay from '../MutationOverlay';
 
 export default function StrategyCoreShell() {
@@ -40,14 +39,14 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.2, // slightly reduced bloom intensity for clarity
+        1.2,
         0.4,
         0.7
       )
     );
 
     // 🧠 AGI Plasma Spine
-    const beamGeometry = new THREE.PlaneGeometry(0.045, 3.0, 1, 1); // slightly thicker and shorter
+    const beamGeometry = new THREE.PlaneGeometry(0.045, 3.0, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
@@ -81,14 +80,9 @@ export default function StrategyCoreShell() {
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
-      <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
-        <GazeEyes />
-      </div>
-
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
-
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
