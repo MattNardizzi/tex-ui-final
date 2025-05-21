@@ -12,7 +12,7 @@ export default function BeamRenderer() {
   const beamRef = useRef();
 
   useEffect(() => {
-    const mat = createSpineShaderMaterial(new THREE.Color("#00ff88")); // TEMP color
+    const mat = createSpineShaderMaterial(getCurrentGlowColor());
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
@@ -21,24 +21,23 @@ export default function BeamRenderer() {
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     const gain = getNeedPulse();
+    const color = getCurrentGlowColor();
 
     if (!beamRef.current?.material?.uniforms) return;
 
     const u = beamRef.current.material.uniforms;
     u.uTime.value = t;
     u.uGain.value = gain;
-    u.uColor.value.lerp(new THREE.Color("#00ff88"), 0.1); // TEMP fixed glow
+    u.uColor.value.lerp(color, 0.05);
   });
 
   return (
     <>
-      {/* 🔆 TEMP debug light */}
-      <ambientLight intensity={0.5} />
-      <pointLight position={[0, 0, 2]} intensity={2} color="#00ffaa" />
+      <ambientLight intensity={0.7} />
+      <pointLight position={[0, 0, 2]} intensity={3} color="#00ffaa" />
 
-      {/* 🧬 Spine Beam */}
       <mesh ref={beamRef} position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 4, 32, 1, true]} />
+        <cylinderGeometry args={[0.015, 0.015, 10, 64, 1, true]} />
       </mesh>
     </>
   );
