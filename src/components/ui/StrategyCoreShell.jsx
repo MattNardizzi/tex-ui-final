@@ -6,9 +6,7 @@ import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 import { useEmotion } from '@/systems/emotionEngine';
-import { getNeedPulse } from '@/systems/needPulse';
 import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
-import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
 import TypingPanel from '../TypingPanel';
 import BeamRenderer from '../BeamRenderer.jsx';
@@ -40,32 +38,6 @@ function CoreRing() {
   );
 }
 
-function AliveBeam() {
-  const beamRef = useRef();
-  const { emotionColor } = useEmotion();
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    const gain = getNeedPulse();
-
-    if (!beamRef.current?.material?.uniforms) return;
-
-    beamRef.current.material.uniforms.uTime.value = t;
-    beamRef.current.material.uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
-    beamRef.current.material.uniforms.uGain.value = gain;
-  });
-
-  return (
-    <mesh ref={beamRef} position={[0, 1.35, 0]}>
-      <planeGeometry args={[0.44, 3.4]} />
-      <shaderMaterial
-        args={[createSpineShaderMaterial('#00faff')]}
-        attach="material"
-      />
-    </mesh>
-  );
-}
-
 export default function StrategyCoreShell() {
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
@@ -79,7 +51,7 @@ export default function StrategyCoreShell() {
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
         <CoreRing />
-        <AliveBeam />
+        <BeamRenderer /> {/* ✅ Now using upgraded dynamic spine */}
       </Canvas>
 
       <TypingPanel />
