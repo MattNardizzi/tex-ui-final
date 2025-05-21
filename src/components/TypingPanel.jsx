@@ -1,8 +1,10 @@
-// TypingPanel.jsx
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export default function TypingPanel() {
+  // ... rest of your code
+}
+
   const [log, setLog] = useState(["Tex initialized..."]);
 
   // Simulate output feed (replace with tex_core_api later)
