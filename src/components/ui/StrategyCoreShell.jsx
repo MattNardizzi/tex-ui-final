@@ -47,8 +47,8 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 0.1, 0]} // ⬆️ lifted back into full frame
-      rotation-x={-Math.PI / 2} // 3D vertical projection
+      position={[0, 0.7, 0]} // ✅ Perfect vertical center
+      rotation-x={-Math.PI / 2} // ✅ Vertical projection into Z space
     >
       <planeGeometry args={[0.075, 2.4]} />
       <shaderMaterial
@@ -62,7 +62,7 @@ function SpineBeam() {
 
 function CoreRing() {
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -1.1, 0]}>
+    <mesh rotation-x={-Math.PI / 2} position={[0, 0.35, 0]}>
       <ringGeometry args={[0.1, 0.17, 64]} />
       <meshBasicMaterial
         color={new THREE.Color('#00faff')}
@@ -77,7 +77,7 @@ function CoreRing() {
 export default function StrategyCoreShell() {
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* Top/bottom fade mask */}
+      {/* Fade Mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
       <Canvas
@@ -91,12 +91,12 @@ export default function StrategyCoreShell() {
         <CoreRing />
       </Canvas>
 
-      {/* AGI UI Overlays */}
+      {/* Tex UI */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* Finance HUD */}
+      {/* Ticker */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
