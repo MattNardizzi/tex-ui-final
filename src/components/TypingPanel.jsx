@@ -1,40 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from "react";
 
-const TypingPanel = () => {
-  const [input, setInput] = useState('');
+// 🧠 UI components
+import GazeEyes from "./GazeEyes.jsx";
+import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
+import FinanceTicker from "./FinanceTicker.jsx";
+import TypingPanel from "../TypingPanel.jsx"; // ← This is in parent folder
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    // Connect to Tex logic
-    setInput('');
-  };
+// ⚙️ System logic
+import { getNeedPulse } from "../../systems/getNeedPulse.js";
+import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine.js";
+
+export default function StrategyCoreShell() {
+  const mount = useRef(null);
+
+  useEffect(() => {
+    // ✅ Your spine, beam, shader, and pulse animation logic goes here
+    // This is where you'd use mount.current to hook into Three.js, Tone.js, etc.
+  }, []);
 
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-2xl px-4 z-30">
-      <form onSubmit={handleSubmit} className="relative flex items-center">
-        {/* Input Box */}
-        <input
-          type="text"
-          placeholder="Ask Tex anything..."
-          className="w-full py-3 px-4 pr-12 rounded-xl bg-black bg-opacity-70 text-white placeholder-gray-400 focus:outline-none shadow-lg"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          autoComplete="off"
-        />
+    <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
+      
+      {/* 👁️ Tex’s Gaze */}
+      <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2">
+        <GazeEyes />
+      </div>
 
-        {/* Glowing Green Circle Button */}
-        <button
-          type="submit"
-          className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-green-400"
-          style={{
-            boxShadow: '0 0 8px 3px rgba(0, 255, 100, 0.6)',
-          }}
-        />
-      </form>
+      {/* 💬 User Input */}
+      <TypingPanel />
+
+      {/* 🧠 System Info Overlay */}
+      <InstitutionalOverlay />
+
+      {/* 📉 Real-Time Market Stream */}
+      <div className="pointer-events-none absolute bottom-2 w-full flex justify-center">
+        <FinanceTicker />
+      </div>
+      
     </div>
   );
-};
-
-export default TypingPanel;
+}
