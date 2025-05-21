@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
-import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
 import {
   getEmotionGlowColor,
@@ -18,101 +17,82 @@ import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
 import MutationOverlay from '../MutationOverlay';
 
-export default function StrategyCoreShell() {
-  const mountRef = useRef(null);
-  const lastEmotionRef = useRef(getEmotionName());
+function SpineBeam() {
+  const meshRef = useRef();
+  const materialRef = useRef();
+  const lastEmotion = useRef(getEmotionName());
 
   useEffect(() => {
-    // 🧠 Scene setup
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
-
-    // 🎥 Camera
-    const camera = new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
-    camera.position.set(0, 0.1, 3.2);
-
-    // 🖥️ Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    mountRef.current.appendChild(renderer.domElement);
-
-    // ✨ Postprocessing (Bloom)
-    const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(
-      new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.3,
-        0.4,
-        0.65
-      )
-    );
-
-    // 🌐 Core Beam (final thickness and height)
-    const beamGeometry = new THREE.PlaneGeometry(0.075, 2.4, 1, 1);
-    const beamMaterial = createSpineShaderMaterial();
-    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
-    beam.rotation.y = Math.PI;
-    scene.add(beam);
-
-    // 🔁 Emotion cycling
     autoCycleEmotion(10000);
-
-    // 🎞️ Animation loop
-    const animate = () => {
-      const t = performance.now() * 0.001;
-      beamMaterial.uniforms.uTime.value = t;
-
-      const currentEmotion = getEmotionName();
-      const nextColor = getEmotionGlowColor();
-      const currentColor = beamMaterial.uniforms.uColor.value;
-
-      if (lastEmotionRef.current !== currentEmotion) {
-        lastEmotionRef.current = currentEmotion;
-        currentColor.lerp(nextColor, 0.1);
-      } else {
-        currentColor.lerp(nextColor, 0.04);
-      }
-
-      composer.render();
-      requestAnimationFrame(animate);
-    };
-    animate();
-
-    // 📏 Window resizing
-    const handleResize = () => {
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      renderer.setSize(width, height);
-      composer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    };
-    window.addEventListener('resize', handleResize);
-
-    // 🧼 Cleanup on destroy
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      mountRef.current.removeChild(renderer.domElement);
-      renderer.dispose();
-    };
   }, []);
 
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = t;
+
+      const currentEmotion = getEmotionName();
+      const targetColor = getEmotionGlowColor();
+      const color = materialRef.current.uniforms.uColor.value;
+
+      if (lastEmotion.current !== currentEmotion) {
+        lastEmotion.current = currentEmotion;
+        color.lerp(targetColor, 0.1);
+      } else {
+        color.lerp(targetColor, 0.04);
+      }
+    }
+  });
+
   return (
-    <div
-      ref={mountRef}
-      className="relative w-screen h-screen bg-black overflow-hidden"
+    <mesh
+      ref={meshRef}
+      position={[0, -1.2, 0]} // Positioned lower into 3D space
+      rotation-x={-Math.PI / 2} // Rotated to face camera vertically in Z-space
     >
-      {/* Top and bottom fade mask */}
+      <planeGeometry args={[0.075, 2.4]} />
+      <shaderMaterial
+        ref={materialRef}
+        args={[createSpineShaderMaterial(getEmotionGlowColor())]}
+        attach="material"
+      />
+    </mesh>
+  );
+}
+
+function CoreRing() {
+  return (
+    <mesh rotation-x={-Math.PI / 2} position={[0, -2.4, 0]}>
+      <ringGeometry args={[0.1, 0.17, 64]} />
+      <meshBasicMaterial
+        color={new THREE.Color('#00faff')}
+        transparent
+        opacity={0.15}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+export default function StrategyCoreShell() {
+  return (
+    <div className="relative w-screen h-screen bg-black overflow-hidden">
+      {/* Top/bottom fade mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* AGI Overlays */}
+      {/* Canvas Scene */}
+      <Canvas
+        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]}
+        camera={{ position: [0, 0.1, 3.2], fov: 60 }}
+      >
+        <PerspectiveCamera makeDefault position={[0, 0.1, 3.2]} />
+        <ambientLight intensity={0.1} />
+        <SpineBeam />
+        <CoreRing />
+      </Canvas>
+
+      {/* AGI UI Overlays */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
