@@ -23,7 +23,7 @@ export default function StrategyCoreShell() {
   const lastEmotionRef = useRef(getEmotionName());
 
   useEffect(() => {
-    // 🚀 Scene
+    // 🧠 Initialize scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
 
@@ -36,13 +36,13 @@ export default function StrategyCoreShell() {
     );
     camera.position.set(0, 0.1, 3.2);
 
-    // 🌐 Renderer
+    // 🖥️ Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    // ✨ Postprocessing
+    // ✨ Postprocessing (bloom)
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
@@ -54,30 +54,30 @@ export default function StrategyCoreShell() {
       )
     );
 
-    // 🧠 Core Beam (final, clean geometry)
-    const beamGeometry = new THREE.PlaneGeometry(0.0625, 2.65, 1, 1);
+    // 🌐 Core Beam (final, tuned dimensions)
+    const beamGeometry = new THREE.PlaneGeometry(0.0675, 2.75, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Auto-cycle emotions
+    // 🔁 Auto cycle through emotions
     autoCycleEmotion(10000);
 
-    // 🎞️ Render loop
+    // 🔄 Animate render loop
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
 
       const currentEmotion = getEmotionName();
       const targetColor = getEmotionGlowColor();
-      const currentColor = beamMaterial.uniforms.uColor.value;
+      const activeColor = beamMaterial.uniforms.uColor.value;
 
       if (lastEmotionRef.current !== currentEmotion) {
         lastEmotionRef.current = currentEmotion;
-        currentColor.lerp(targetColor, 0.1);
+        activeColor.lerp(targetColor, 0.1);
       } else {
-        currentColor.lerp(targetColor, 0.04);
+        activeColor.lerp(targetColor, 0.04);
       }
 
       composer.render();
@@ -85,18 +85,18 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 📏 Handle resizes
+    // 📏 Handle resizing
     const handleResize = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      renderer.setSize(w, h);
-      composer.setSize(w, h);
-      camera.aspect = w / h;
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+      renderer.setSize(width, height);
+      composer.setSize(width, height);
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
     };
     window.addEventListener('resize', handleResize);
 
-    // 🧹 Clean up
+    // 🧼 Cleanup on destroy
     return () => {
       window.removeEventListener('resize', handleResize);
       mountRef.current.removeChild(renderer.domElement);
@@ -109,10 +109,15 @@ export default function StrategyCoreShell() {
       ref={mountRef}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
+      {/* Fade overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
+
+      {/* AGI UI Modules */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
+
+      {/* Market HUD */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
