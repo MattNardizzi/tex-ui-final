@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useRef, useEffect } from "react";
+import { Canvas } from '@react-three/fiber';
 
-// ✅ UI Components (inside /ui/)
+// ✅ UI Components
 import GazeEyes from "./GazeEyes.jsx";
 import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
-
-// ✅ TypingPanel (located in /components/)
 import TypingPanel from "../TypingPanel.jsx";
+import BeamRenderer from "./BeamRenderer.jsx";
 
 // ✅ Systems
 import { getNeedPulse } from "../../systems/getNeedPulse.js";
@@ -18,15 +18,19 @@ export default function StrategyCoreShell() {
   const mount = useRef(null);
 
   useEffect(() => {
-    // 🔧 This is where you’ll mount Three.js, shaders, beam animations
-    // Example: initSpineScene(mount.current)
+    // Placeholder for shader/init logic if needed later
   }, []);
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      
+
+      {/* 🌐 Spine Render (3D beam) */}
+      <Canvas className="absolute inset-0 z-10 pointer-events-none">
+        <BeamRenderer />
+      </Canvas>
+
       {/* 👁️ Eye tracker */}
-      <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2">
+      <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
         <GazeEyes />
       </div>
 
@@ -37,10 +41,9 @@ export default function StrategyCoreShell() {
       <InstitutionalOverlay />
 
       {/* 📊 Real-time financial ticker */}
-      <div className="pointer-events-none absolute bottom-2 w-full flex justify-center">
+      <div className="pointer-events-none absolute bottom-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
-
     </div>
   );
 }
