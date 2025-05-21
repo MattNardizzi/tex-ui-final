@@ -14,8 +14,8 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vPosition = position;
 
-        // Minimal taper for slight glow shape only
-        float taper = 1.0 - smoothstep(1.6, 2.2, abs(position.y));
+        // Softer tapering for gentle glow, not hard pole
+        float taper = 1.0 - smoothstep(2.0, 3.3, abs(position.y));
         vec3 pos = position;
         pos.x *= taper;
 
@@ -31,16 +31,16 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       varying vec2 vUv;
       varying vec3 vPosition;
 
-      // Strong inner glow
+      // Deep core fresnel glow
       float fresnel(vec2 uv) {
         float dist = length(uv - vec2(0.5));
-        return pow(1.0 - dist, 3.8);
+        return pow(1.0 - dist, 4.5); // sharper gradient inward
       }
 
-      // Smooth top and bottom edge blending
+      // Smooth vertical fade to black top and bottom
       float verticalFade(vec2 uv) {
-        float top = smoothstep(0.98, 0.5, uv.y);
-        float bottom = smoothstep(0.02, 0.45, uv.y);
+        float top = smoothstep(0.95, 0.5, uv.y);
+        float bottom = smoothstep(0.05, 0.45, uv.y);
         return top * bottom;
       }
 
@@ -53,7 +53,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         pulse = max(pulse, 0.15);
 
         float core = fresnel(vUv);
-        float halo = smoothstep(0.4, 0.5, abs(vUv.x - 0.5)) * 0.15;
+        float halo = smoothstep(0.42, 0.5, abs(vUv.x - 0.5)) * 0.18;
 
         float intensity = (core + halo) * fade * pulse;
 
@@ -62,7 +62,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       }
     `,
     side: THREE.DoubleSide,
-    transparent: false,
-    depthWrite: true,
+    transparent: true,       // ✅ Enables layering glow
+    depthWrite: false,       // ✅ Ensures proper blend with background
   });
 }
