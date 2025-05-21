@@ -14,7 +14,6 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       void main() {
         vY = position.y;
         vPosition = position;
-
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `,
@@ -29,22 +28,28 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       varying vec3 vPosition;
 
       float taper(float y) {
-        float top = smoothstep(1.6, 1.2, y);
-        float bottom = smoothstep(-1.2, -1.6, y);
+        float top = smoothstep(1.4, 1.0, y);
+        float bottom = smoothstep(-1.0, -1.4, y);
         return top * bottom;
       }
 
       float pulse(float y, float time) {
-        return 0.8 + 0.2 * sin(time * 4.0 + y * 8.0 + cos(y * 10.0 + time * 0.5));
+        return 0.7 + 0.3 * sin(time * 4.0 + y * 10.0);
+      }
+
+      float fresnel(float y) {
+        return smoothstep(0.6, 1.4, abs(y));
       }
 
       void main() {
         float taperVal = taper(vY);
         float pulseVal = pulse(vY, uTime);
-        float intensity = taperVal * pulseVal * uGain;
+        float edge = fresnel(vY);
 
-        vec3 glow = uColor * intensity * 1.5;
-        gl_FragColor = vec4(glow, clamp(intensity, 0.3, 1.0));
+        float intensity = taperVal * pulseVal * uGain;
+        vec3 color = uColor * intensity + uColor * edge * 0.2;
+
+        gl_FragColor = vec4(color, clamp(intensity + edge, 0.1, 1.0));
       }
     `,
     transparent: true,
