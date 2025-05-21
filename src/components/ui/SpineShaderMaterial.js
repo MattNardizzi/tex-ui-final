@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export function createSpineShaderMaterial(emotionColor = '#00ff88') {
+export function createSpineShaderMaterial(emotionColor = '#00ffaa') {
   return new THREE.ShaderMaterial({
     uniforms: {
       uTime: { value: 0 },
@@ -27,7 +27,7 @@ export function createSpineShaderMaterial(emotionColor = '#00ff88') {
       }
 
       float pulse(float y, float t) {
-        return 0.9 + 0.4 * sin(t * 3.0 + y * 8.0 + cos(y * 5.0));
+        return 0.9 + 0.4 * sin(t * 2.0 + y * 5.0 + cos(y * 3.0));
       }
 
       void main() {
