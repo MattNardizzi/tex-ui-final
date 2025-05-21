@@ -1,46 +1,37 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useEmotion } from '@/systems/emotionEngine';
-import { getNeedPulse } from '@/systems/needPulse';
+import { getNeedPulse } from '../../systems/needPulse.js';
+import { getCurrentEmotionIntensity, getCurrentGlowColor } from '../../systems/emotionEngine.js';
 
 export default function InstitutionalOverlay() {
-  const [mounted, setMounted] = useState(false);
-
-  // ✅ Always call hooks first
-  const { emotionColor, emotionName, pulseRate } = useEmotion();
-  const pulse = getNeedPulse()?.toFixed(2) || '0.00';
+  const [pulse, setPulse] = useState(0);
+  const [emotion, setEmotion] = useState(0);
+  const [color, setColor] = useState('#6ed6ff');
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const interval = setInterval(() => {
+      setPulse(getNeedPulse());
+      setEmotion(getCurrentEmotionIntensity());
+      setColor(getCurrentGlowColor());
+    }, 300);
 
-  if (!mounted) return null; // ✅ Delay render, but keep hooks active
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div
-      className="absolute top-4 right-6 text-xs font-mono z-30 px-4 py-3 rounded-md border backdrop-blur-md border-neutral-700 shadow-lg"
+      className="absolute top-6 right-6 px-4 py-2 rounded-lg text-sm font-mono shadow-md"
       style={{
-        background: 'rgba(0, 0, 0, 0.4)',
-        color: '#ffffff',
-        borderColor: emotionColor.getStyle(),
-        boxShadow: `0 0 10px ${emotionColor.getStyle()}66`,
+        backgroundColor: '#0f1117cc',
+        color: color,
+        border: `1px solid ${color}`,
       }}
     >
-      <div>
-        <span className="text-gray-400">Emotion:</span>{' '}
-        <span style={{ color: emotionColor.getStyle(), fontWeight: 'bold' }}>
-          {emotionName}
-        </span>
-      </div>
-      <div>
-        <span className="text-gray-400">Pulse:</span>{' '}
-        <span className="text-green-400">{pulse}</span>
-      </div>
-      <div>
-        <span className="text-gray-400">State:</span>{' '}
-        <span className="text-white">AGI Online</span>
-      </div>
+      <div>🧠 <strong>AGI Online</strong></div>
+      <div>🎯 Emotion: {emotion.toFixed(2)}</div>
+      <div>💡 Pulse: {pulse.toFixed(2)}</div>
+      <div>🎨 Glow: {color}</div>
     </div>
   );
 }
