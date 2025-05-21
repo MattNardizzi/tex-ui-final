@@ -1,4 +1,4 @@
-'use client';
+f'use client';
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
@@ -14,7 +14,7 @@ import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
 import GazeEyes from './GazeEyes';
-import MutationOverlay from './MutationOverlay';
+import MutationOverlay from '../MutationOverlay';
 
 const CFG = {
   breathPeriod: 4.5,
