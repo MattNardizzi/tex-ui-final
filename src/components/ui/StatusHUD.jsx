@@ -1,24 +1,23 @@
-// StatusHUD.jsx
 import React, { useEffect, useState } from "react";
 import getNeedPulse from "../../systems/getNeedPulse";
-import emotionEngine from "../../systems/emotionEngine";
+import emotionEngine, { getEmotionLabel } from "../../systems/emotionEngine";
 
 export default function StatusHUD() {
   const [pulse, setPulse] = useState(0.2);
+  const [color, setColor] = useState("#00ff66");
   const [emotion, setEmotion] = useState("Focused");
   const [state, setState] = useState("AGI Online");
-  const [color, setColor] = useState("#00ff66");
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPulse(getNeedPulse());
+      const newPulse = getNeedPulse();
       const newColor = emotionEngine();
+      const newEmotion = getEmotionLabel();
+
+      setPulse(newPulse);
       setColor(newColor);
-      // This assumes emotionEngine handles emotion state color
-      if (newColor === "#00ccff") setEmotion("Curious");
-      else if (newColor === "#ff0055") setEmotion("Aggressive");
-      else if (newColor === "#9900ff") setEmotion("Focused");
-    }, 2000);
+      setEmotion(newEmotion);
+    }, 1500);
 
     return () => clearInterval(interval);
   }, []);
