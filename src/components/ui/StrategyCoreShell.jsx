@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
 
-import BeamRenderer from '../BeamRenderer.jsx'; // ✅ Fixed path
+import BeamRenderer from '../BeamRenderer.jsx';
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
@@ -13,6 +13,7 @@ import MutationOverlay from '../MutationOverlay';
 
 function CoreRing() {
   const materialRef = useRef();
+
   useFrame(({ clock }) => {
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
@@ -21,7 +22,7 @@ function CoreRing() {
 
   return (
     <mesh rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
-      <ringGeometry args={[0.1, 0.17, 64]} />
+      <ringGeometry args={[0.12, 0.24, 128]} /> {/* ⬅️ Better resolution & glow body */}
       <shaderMaterial
         ref={materialRef}
         args={[createCoreRingShaderMaterial('#00faff')]}
