@@ -12,32 +12,33 @@ export default function BeamRenderer() {
   const beamRef = useRef();
 
   useEffect(() => {
-    const mat = createSpineShaderMaterial(new THREE.Color('#00ff88')); // bright teal fallback
+    const fallbackColor = new THREE.Color('#ff00ff'); // 🔥 hot pink fallback
+    const mat = createSpineShaderMaterial(fallbackColor);
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
   }, []);
 
   useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    const gain = Math.max(0.6, getNeedPulse()); // force strong visibility
+    const time = clock.getElapsedTime();
+    const gain = Math.max(0.7, getNeedPulse());
     const color = getCurrentGlowColor();
 
     if (!beamRef.current?.material?.uniforms) return;
 
     const u = beamRef.current.material.uniforms;
-    u.uTime.value = t;
+    u.uTime.value = time;
     u.uGain.value = gain;
-    u.uColor.value.lerp(color, 0.1);
+    u.uColor.value.lerp(color, 0.05);
   });
 
   return (
     <>
-      <ambientLight intensity={1.0} />
-      <pointLight position={[0, 0, 5]} intensity={4} color="#00ffaa" />
+      <ambientLight intensity={1.2} />
+      <pointLight position={[0, 0, 4]} intensity={4} color="#ffffff" />
 
       <mesh ref={beamRef} position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.05, 0.05, 12, 64, 1, true]} />
+        <cylinderGeometry args={[0.07, 0.07, 20, 64, 1, true]} />
       </mesh>
     </>
   );
