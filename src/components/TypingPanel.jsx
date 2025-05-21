@@ -1,44 +1,44 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
+// TypingPanel.jsx
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 
 export default function TypingPanel() {
-  const [input, setInput] = useState('');
-  const [lastTyped, setLastTyped] = useState('');
+  const [log, setLog] = useState(["Tex initialized..."]);
 
+  // Simulate output feed (replace with tex_core_api later)
   useEffect(() => {
-    if (input.trim() !== '') {
-      setLastTyped(input);
-    }
-  }, [input]);
+    const interval = setInterval(() => {
+      setLog((prev) => [
+        ...prev.slice(-7),
+        `Tex: ${generateMockOutput()}`
+      ]);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
-  const handleChange = (e) => {
-    setInput(e.target.value);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      // ⬇️ You can connect this to Tex's brain later
-      console.log('[Tex] →', input);
-      setInput('');
-    }
+  const generateMockOutput = () => {
+    const samples = [
+      "Scanning digital substrate...",
+      "Analyzing cognitive loop...",
+      "Pulse stabilizing at 0.21",
+      "No anomalies detected.",
+      "Initiating tactical feedback...",
+      "Emotion shift: Curious → Focused",
+      "Core mutation sequence aligned."
+    ];
+    return samples[Math.floor(Math.random() * samples.length)];
   };
 
   return (
-    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] md:w-[70%]">
-      <input
-        type="text"
-        placeholder="Ask Tex anything..."
-        value={input}
-        onChange={handleChange}
-        onKeyPress={handleKeyPress}
-        className="w-full px-4 py-3 bg-black/80 text-white text-lg rounded-xl border border-[#6ed6ff] shadow-lg focus:outline-none focus:ring-2 focus:ring-[#6ed6ff] transition-all duration-150 placeholder-gray-400"
-      />
-      {lastTyped && (
-        <div className="mt-2 text-sm text-[#6ed6ff] tracking-wide">
-          Last command: <span className="italic">{lastTyped}</span>
-        </div>
-      )}
-    </div>
+    <motion.div
+      className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-[80%] max-w-3xl bg-black/50 text-white p-4 rounded-xl border border-white/20 backdrop-blur-sm shadow-lg text-sm leading-relaxed font-mono z-40"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 1, duration: 1 }}
+    >
+      {log.map((line, i) => (
+        <div key={i} className="whitespace-pre-wrap">{line}</div>
+      ))}
+    </motion.div>
   );
 }
