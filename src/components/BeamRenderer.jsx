@@ -1,50 +1,46 @@
-'use client';
-
-import React, { useRef, useEffect } from 'react';
-import * as THREE from 'three';
-import { useFrame } from '@react-three/fiber';
-
-import { getNeedPulse } from '@/systems/needPulse';
-import { getCurrentGlowColor } from '@/systems/emotionEngine';
-import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
+// BeamRenderer.jsx
+import React, { useEffect, useState } from "react";
+import { motion, useAnimation } from "framer-motion";
+import getNeedPulse from "../../systems/getNeedPulse";
+import emotionEngine from "../../systems/emotionEngine";
 
 export default function BeamRenderer() {
-  const beamRef = useRef();
+  const controls = useAnimation();
+  const [pulse, setPulse] = useState(0.2);
+  const [color, setColor] = useState("#00ff66");
 
   useEffect(() => {
-    const mat = createSpineShaderMaterial('#00ffaa');
-    if (beamRef.current) {
-      beamRef.current.material = mat;
-    }
+    const updatePulse = () => {
+      const newPulse = getNeedPulse(); // e.g. 0.2 to 1.0
+      const newColor = emotionEngine(); // e.g. "#00ff66", "#00ccff", "#9900ff"
+      setPulse(newPulse);
+      setColor(newColor);
+
+      controls.start({
+        opacity: [0.6, 1, 0.6],
+        transition: {
+          duration: 1.5 - newPulse,
+          ease: "easeInOut",
+          repeat: Infinity
+        }
+      });
+    };
+
+    updatePulse(); // initial call
+    const interval = setInterval(updatePulse, 2000);
+    return () => clearInterval(interval);
   }, []);
 
-  useFrame(({ clock }) => {
-    if (!beamRef.current?.material?.uniforms) return;
-
-    const time = clock.getElapsedTime();
-    const gain = Math.max(0.6, getNeedPulse());
-
-    let colorValue = getCurrentGlowColor();
-    const color = typeof colorValue === 'string'
-      ? new THREE.Color(colorValue)
-      : colorValue?.isColor
-        ? colorValue
-        : new THREE.Color('#00ffaa');
-
-    const uniforms = beamRef.current.material.uniforms;
-    uniforms.uTime.value = time;
-    uniforms.uGain.value = gain;
-    uniforms.uColor.value.lerp(color, 0.1);
-  });
-
   return (
-    <>
-      <ambientLight intensity={1.2} />
-      <pointLight position={[0, 0, 5]} intensity={3} color="#00ffaa" />
-
-      <mesh ref={beamRef} position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.04, 0.04, 20, 64, 1, true]} />
-      </mesh>
-    </>
+    <motion.div
+      animate={controls}
+      className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[2px] h-full"
+      style={{
+        background: color,
+        boxShadow: `0 0 16px ${color}, 0 0 80px ${color}`,
+        filter: "blur(0.7px)",
+        zIndex: 10
+      }}
+    />
   );
 }
