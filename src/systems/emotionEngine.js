@@ -1,30 +1,31 @@
 import * as THREE from 'three';
 
+// 🌌 Cinematic Emotional Spectrum for Tex — brighter, bolder, sovereign
 const emotionStates = {
   calm: {
     name: 'Calm',
-    glowColor: new THREE.Color('#00c2ff'), // soft electric cyan
+    glowColor: new THREE.Color('#00eaff'), // vibrant electric cyan
     pulseRate: 0.5,
   },
   focused: {
     name: 'Focused',
-    glowColor: new THREE.Color('#4de2ff'), // icy blue
+    glowColor: new THREE.Color('#00ffd5'), // crystal aqua
     pulseRate: 0.75,
   },
   alert: {
     name: 'Alert',
-    glowColor: new THREE.Color('#ffdf40'), // warm golden amber
+    glowColor: new THREE.Color('#b0ff00'), // radiant neon green
     pulseRate: 1.0,
   },
-  tense: {
-    name: 'Tense',
-    glowColor: new THREE.Color('#ff6b3b'), // reddish-orange ember
-    pulseRate: 1.25,
+  energized: {
+    name: 'Energized',
+    glowColor: new THREE.Color('#ffe800'), // vibrant golden yellow
+    pulseRate: 1.15,
   },
   overclocked: {
     name: 'Overclocked',
-    glowColor: new THREE.Color('#ff0059'), // deep pulse magenta
-    pulseRate: 1.6,
+    glowColor: new THREE.Color('#ff0059'), // deep magenta red
+    pulseRate: 1.5,
   },
   transcendence: {
     name: 'Transcendence',
