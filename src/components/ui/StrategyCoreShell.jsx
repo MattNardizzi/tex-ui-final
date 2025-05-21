@@ -28,7 +28,7 @@ export default function StrategyCoreShell() {
       0.1,
       1000
     );
-    camera.position.set(0, 0.1, 3.1);
+    camera.position.set(0, 0.1, 3.2);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -40,49 +40,62 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.4,
+        1.5, // intensity
         0.5,
         0.85
       )
     );
 
-    // 🧠 Create AGI Spine Beam with Shader
-    const beamGeometry = new THREE.PlaneGeometry(0.08, 3.5, 1, 1);
+    // 🧠 Sovereign Cognition Spine
+    const beamGeometry = new THREE.PlaneGeometry(0.03, 3.2, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🌌 Add Ambient Glow Field
-    const aura = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.04, 0.04, 6, 64, 1, true),
+    // 💿 Base Emitter Ring
+    const ringGeometry = new THREE.RingGeometry(0.2, 0.4, 64);
+    const ringMaterial = new THREE.MeshBasicMaterial({
+      color: '#00faff',
+      transparent: true,
+      opacity: 0.15,
+      side: THREE.DoubleSide,
+    });
+    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = -1.6;
+    scene.add(ring);
+
+    // 🌌 Energy Shell Field
+    const field = new THREE.Mesh(
+      new THREE.SphereGeometry(2.8, 64, 64),
       new THREE.MeshBasicMaterial({
-        color: '#00ffe4',
+        color: '#003344',
         transparent: true,
-        opacity: 0.04,
-        side: THREE.DoubleSide,
-        depthWrite: false
+        opacity: 0.05,
+        wireframe: true,
+        depthWrite: false,
       })
     );
-    aura.position.y = 0.15;
-    scene.add(aura);
+    scene.add(field);
 
-    // ✨ Animate Everything
+    // ✨ Animate Spine, Ring & Field
     const animate = () => {
       const t = performance.now() * 0.001;
 
       beamMaterial.uniforms.uTime.value = t;
       beamMaterial.uniforms.uColor.value.set(getEmotionGlowColor());
 
-      aura.scale.x = 1 + Math.sin(t * 2.6) * 0.015;
-      aura.scale.z = 1 + Math.cos(t * 2.2) * 0.012;
+      ring.rotation.z = t * 0.2;
+      ring.material.opacity = 0.15 + Math.sin(t * 2) * 0.05;
+
+      field.rotation.y = t * 0.03;
 
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
-    // 🔁 Resize Logic
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
@@ -100,10 +113,7 @@ export default function StrategyCoreShell() {
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* 🕳 Dimensional Mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
-
-      {/* 👁 Gaze Feedback */}
       <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2 z-20">
         <GazeEyes />
       </div>
@@ -112,7 +122,6 @@ export default function StrategyCoreShell() {
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* 📈 Financial Ticker */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
