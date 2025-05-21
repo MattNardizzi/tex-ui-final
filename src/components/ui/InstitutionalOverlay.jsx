@@ -1,10 +1,18 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useEmotion } from '@/systems/emotionEngine';
 import { getNeedPulse } from '@/systems/needPulse';
 
 export default function InstitutionalOverlay() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   const { emotionColor, emotionName, pulseRate } = useEmotion();
   const pulse = getNeedPulse()?.toFixed(2) || '0.00';
 
