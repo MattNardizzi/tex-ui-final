@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 
 import GazeEyes from "./GazeEyes.jsx";
-import TypingPanel from "./TypingPanel.jsx";
+import TypingPanel from "../TypingPanel.jsx"; // ✅ CORRECTED PATH
 import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
 
