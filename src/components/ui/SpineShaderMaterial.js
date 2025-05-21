@@ -9,7 +9,6 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
     },
     vertexShader: `
       varying float vY;
-
       void main() {
         vY = position.y;
         gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -34,7 +33,6 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       void main() {
         float intensity = taper(vY) * pulse(vY, uTime) * uGain;
         vec3 color = uColor * intensity;
-
         gl_FragColor = vec4(color, clamp(intensity, 0.25, 1.0));
       }
     `,
