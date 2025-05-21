@@ -18,7 +18,12 @@ export default function BeamRenderer() {
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-    if (!beamRef.current?.material) return;
+
+    if (
+      !beamRef.current ||
+      !beamRef.current.material ||
+      !beamRef.current.material.uniforms
+    ) return;
 
     beamRef.current.material.uniforms.uTime.value = t;
     beamRef.current.material.uniforms.uColor.value.lerp(
@@ -30,7 +35,7 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.6, 0]} // ✅ Raised to float above the ring
+      position={[0, 1.6, 0]} // ✅ Floats above ring
       rotation={[0, 0, 0]}
     >
       <planeGeometry args={[0.12, 3.2]} />
