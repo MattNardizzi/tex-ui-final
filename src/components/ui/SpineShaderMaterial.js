@@ -13,7 +13,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vec3 pos = position;
 
-        float taper = 1.0 - smoothstep(2.8, 3.4, abs(pos.y));
+        float taper = 1.0 - smoothstep(2.5, 3.6, abs(pos.y)); // strong taper spread
         pos.x *= taper;
 
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -29,18 +29,19 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
 
       float coreLine(vec2 uv) {
         float d = abs(uv.x - 0.5);
-        return 1.0 - smoothstep(0.015, 0.03, d); // widened just a hair
+        return 1.0 - smoothstep(0.015, 0.035, d); // slightly wider line
       }
 
       float verticalFade(vec2 uv) {
-        float top = pow(smoothstep(1.0, 0.7, uv.y), 1.5);
-        float bottom = pow(smoothstep(0.0, 0.3, uv.y), 1.5);
+        float top = pow(smoothstep(1.0, 0.6, uv.y), 2.0);
+        float bottom = pow(smoothstep(0.0, 0.35, uv.y), 2.0);
         return top * bottom;
       }
 
       float pulseShimmer(vec2 uv) {
-        float wave = sin(uTime * 2.4 + uv.y * 12.0 + sin(uv.x * 16.0 + uTime));
-        return 0.92 + 0.12 * wave;
+        float waveY = sin(uTime * 2.8 + uv.y * 15.0);
+        float waveX = cos(uTime * 1.5 + uv.x * 10.0);
+        return 0.9 + 0.1 * (waveY * waveX);
       }
 
       void main() {
@@ -48,10 +49,10 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         float fade = verticalFade(vUv);
         float pulse = pulseShimmer(vUv);
 
-        float intensity = line * fade * pulse * uGain * 1.8;
+        float intensity = line * fade * pulse * uGain * 2.2; // 🔥 stronger presence
         vec3 color = uColor * intensity;
 
-        gl_FragColor = vec4(color, clamp(intensity, 0.75, 1.0));
+        gl_FragColor = vec4(color, clamp(intensity, 0.7, 1.0));
       }
     `,
     transparent: true,
