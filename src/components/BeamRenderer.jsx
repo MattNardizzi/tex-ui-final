@@ -1,3 +1,5 @@
+"use client";
+
 // BeamRenderer.jsx
 import React, { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
