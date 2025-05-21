@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef } from "react";
 import GazeEyes from "./GazeEyes";
 import TypingPanel from "./TypingPanel";
@@ -5,10 +7,10 @@ import InstitutionalOverlay from "./InstitutionalOverlay";
 import FinanceTicker from "./FinanceTicker";
 
 export default function StrategyCoreShell() {
-  const mount = useRef(null); // ✅ This is required for the spine rendering
+  const mount = useRef(null);
 
   useEffect(() => {
-    // your full Three.js + Tone.js setup should already be here
+    // Your Three.js logic here
   }, []);
 
   return (
