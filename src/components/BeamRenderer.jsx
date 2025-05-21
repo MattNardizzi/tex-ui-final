@@ -36,10 +36,10 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.25, 0]} // Slightly raised to ensure ring visibility
+      position={[0, 1.25, 0]}
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.2, 3.4]} /> {/* Tightened width for sharper beam */}
+      <planeGeometry args={[0.3, 3.4]} /> {/* Wider for more visible pulse */}
     </mesh>
   );
 }
