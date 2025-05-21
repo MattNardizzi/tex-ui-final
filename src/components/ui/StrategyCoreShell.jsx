@@ -6,7 +6,10 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass';
 
-import { getEmotionGlowColor } from '@/systems/emotionEngine';
+import {
+  getEmotionGlowColor,
+  autoCycleEmotion,
+} from '@/systems/emotionEngine';
 import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
 import TypingPanel from '../TypingPanel';
@@ -19,7 +22,7 @@ export default function StrategyCoreShell() {
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // pure black
+    scene.background = new THREE.Color(0x000000); // Sovereign black void
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -39,29 +42,38 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.2,
+        1.2, // Bloom intensity
         0.4,
         0.7
       )
     );
 
-    // 🧠 AGI Plasma Spine
+    // 🧠 Create Spine
     const beamGeometry = new THREE.PlaneGeometry(0.045, 3.0, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // ✨ Animate Spine
+    // 🔁 Auto cycle emotions for demo (optional)
+    autoCycleEmotion(10000); // Change emotion every 10 sec
+
+    // 🔄 Animate
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
-      beamMaterial.uniforms.uColor.value.set(getEmotionGlowColor());
+
+      // Smoothly transition to new emotion color
+      const current = beamMaterial.uniforms.uColor.value;
+      const target = getEmotionGlowColor(); // THREE.Color from emotionEngine
+      current.lerp(target, 0.05); // Smooth blend
+
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
+    // 📐 Handle Resize
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
@@ -78,7 +90,10 @@ export default function StrategyCoreShell() {
   }, []);
 
   return (
-    <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
+    <div
+      ref={mount}
+      className="relative w-screen h-screen bg-black overflow-hidden"
+    >
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
       <TypingPanel />
       <InstitutionalOverlay />
