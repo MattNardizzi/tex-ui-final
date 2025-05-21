@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { useState, useEffect } from 'react';
 
-// 👁️‍🗨️ Sovereign Emotional Spectrum — High-frequency, AGI-calibrated
 const emotionStates = {
   calm: {
     name: 'Calm',
@@ -42,8 +41,6 @@ export function setEmotion(state) {
   if (emotionStates[state]) {
     currentEmotion = state;
     lastChange = Date.now();
-  } else {
-    console.warn(`Unknown emotion state: ${state}`);
   }
 }
 
@@ -57,22 +54,22 @@ export function autoCycleEmotion(interval = 10000) {
   }, interval);
 }
 
-// ✅ Fully reactive hook: updates emotionColor + pulse live
 export function useEmotion() {
-  const [emotion, setEmotionState] = useState({
+  const [emotion, setEmotionState] = useState(() => ({
     emotionColor: emotionStates[currentEmotion].glowColor,
     pulseRate: emotionStates[currentEmotion].pulseRate,
     emotionName: emotionStates[currentEmotion].name,
-  });
+  }));
 
   useEffect(() => {
+    autoCycleEmotion(); // ✅ Starts cycling emotions on load
     const interval = setInterval(() => {
       setEmotionState({
         emotionColor: emotionStates[currentEmotion].glowColor,
         pulseRate: emotionStates[currentEmotion].pulseRate,
         emotionName: emotionStates[currentEmotion].name,
       });
-    }, 100); // 🔄 Check every 100ms for live update
+    }, 100);
 
     return () => clearInterval(interval);
   }, []);
