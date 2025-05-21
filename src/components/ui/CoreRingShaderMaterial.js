@@ -9,7 +9,6 @@ export function createCoreRingShaderMaterial(emotionColor = '#00faff') {
     vertexShader: `
       varying vec2 vUv;
       varying float vAngle;
-
       void main() {
         vUv = uv;
         vAngle = atan(position.y, position.x);
@@ -28,19 +27,15 @@ export function createCoreRingShaderMaterial(emotionColor = '#00faff') {
         vec2 center = vec2(0.5);
         float dist = length(vUv - center);
 
-        // Ring band with softness
         float outer = smoothstep(0.33, 0.29, dist);
         float inner = smoothstep(0.18, 0.22, dist);
         float ring = outer * (1.0 - inner);
 
-        // Inner glow pulse
         float core = smoothstep(0.1, 0.0, dist);
         float corePulse = 0.8 + 0.2 * sin(uTime * 5.0 + dist * 40.0);
 
-        // Spiral shimmer (rotational energy)
         float spiral = sin(vAngle * 12.0 + uTime * 3.5) * 0.5 + 0.5;
 
-        // Total intensity
         float total = (ring * spiral + core * corePulse) * 1.5;
 
         vec3 color = uColor * total;
