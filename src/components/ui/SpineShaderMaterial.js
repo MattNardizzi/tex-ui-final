@@ -5,7 +5,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
     uniforms: {
       uTime: { value: 0 },
       uColor: { value: new THREE.Color(emotionColor) },
-      uGain: { value: 1.0 }, // ✅ Required to prevent shader crash
+      uGain: { value: 1.0 },
     },
     vertexShader: `
       varying vec2 vUv;
@@ -13,7 +13,6 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vec3 pos = position;
 
-        // Taper beam slightly at ends
         float taper = 1.0 - smoothstep(3.0, 3.6, abs(pos.y));
         pos.x *= taper;
 
@@ -39,19 +38,20 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         return top * bottom;
       }
 
-      float pulseShimmer(float y) {
-        return 0.9 + 0.1 * sin(uTime * 2.5 + y * 10.0);
+      float pulseShimmer(vec2 uv) {
+        float shimmer = sin(uTime * 2.5 + uv.y * 10.0 + sin(uv.x * 15.0 + uTime));
+        return 0.9 + 0.2 * shimmer;
       }
 
       void main() {
         float line = coreLine(vUv);
         float fade = verticalFade(vUv);
-        float pulse = pulseShimmer(vUv.y);
+        float pulse = pulseShimmer(vUv);
 
-        float intensity = line * fade * pulse * uGain * 1.4; // ✅ Dynamic gain
+        float intensity = line * fade * pulse * uGain * 1.8;
         vec3 color = uColor * intensity;
 
-        gl_FragColor = vec4(color, clamp(intensity, 0.65, 1.0));
+        gl_FragColor = vec4(color, clamp(intensity, 0.75, 1.0));
       }
     `,
     transparent: true,
