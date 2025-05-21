@@ -47,8 +47,8 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, -1.2, 0]} // Positioned lower into 3D space
-      rotation-x={-Math.PI / 2} // Rotated to face camera vertically in Z-space
+      position={[0, 0.1, 0]} // ⬆️ lifted back into full frame
+      rotation-x={-Math.PI / 2} // 3D vertical projection
     >
       <planeGeometry args={[0.075, 2.4]} />
       <shaderMaterial
@@ -62,7 +62,7 @@ function SpineBeam() {
 
 function CoreRing() {
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -2.4, 0]}>
+    <mesh rotation-x={-Math.PI / 2} position={[0, -1.1, 0]}>
       <ringGeometry args={[0.1, 0.17, 64]} />
       <meshBasicMaterial
         color={new THREE.Color('#00faff')}
@@ -80,7 +80,6 @@ export default function StrategyCoreShell() {
       {/* Top/bottom fade mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* Canvas Scene */}
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
