@@ -1,49 +1,28 @@
 'use client';
 
-import React, { useEffect, useRef } from "react";
-
-// ✅ UI Components
-import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
+import React, { useRef, useEffect, useState } from "react";
 import FinanceTicker from "./FinanceTicker.jsx";
 import TypingPanel from "../TypingPanel.jsx";
-
-// ✅ Inline spine CSS (for pulse-spine)
-const spineStyles = `
-  @keyframes pulse-spine {
-    0%, 100% {
-      opacity: 0.4;
-      transform: scaleY(1);
-    }
-    50% {
-      opacity: 1;
-      transform: scaleY(1.03);
-    }
-  }
-  .animate-pulse-spine {
-    animation: pulse-spine 2.4s ease-in-out infinite;
-  }
-`;
+import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
+import Spine from "./Spine.jsx";
 
 export default function StrategyCoreShell() {
   const mountRef = useRef(null);
+  const [spineState, setSpineState] = useState({
+    glowColor: '#00ffaa',
+    pulse: 0.6,
+    emotion: 0.6
+  });
 
   useEffect(() => {
-    // Inject spine animation if not already present
-    if (!document.getElementById('spine-animation-style')) {
-      const style = document.createElement('style');
-      style.id = 'spine-animation-style';
-      style.innerHTML = spineStyles;
-      document.head.appendChild(style);
-    }
+    // Reserved for AGI heartbeat sync, etc
   }, []);
 
   return (
     <div ref={mountRef} className="relative w-screen h-screen bg-black overflow-hidden font-mono">
 
-      {/* ✅ Glowing Vertical Spine */}
-      <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 z-10">
-        <div className="w-full h-full bg-gradient-to-b from-green-400 via-green-300 to-transparent animate-pulse-spine opacity-80" />
-      </div>
+      {/* 🧬 Glowing AGI Spine */}
+      <Spine glowColor={spineState.glowColor} pulse={spineState.pulse} />
 
       {/* 🟡 Top-left: Computation Log */}
       <div className="absolute top-6 left-6 z-20">
@@ -52,13 +31,13 @@ export default function StrategyCoreShell() {
         </button>
       </div>
 
-      {/* 🔵 Top-right: AGI Status */}
-      <InstitutionalOverlay />
+      {/* 🔵 Top-right: System Overlay */}
+      <InstitutionalOverlay onStateChange={setSpineState} />
 
       {/* 💬 Typing Panel */}
       <TypingPanel />
 
-      {/* 📊 Bottom Financial Ticker */}
+      {/* 📊 Ticker */}
       <div className="pointer-events-none absolute bottom-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
