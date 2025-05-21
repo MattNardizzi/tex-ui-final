@@ -23,10 +23,11 @@ export default function StrategyCoreShell() {
   const lastEmotion = useRef(getEmotionName());
 
   useEffect(() => {
-    // 🌌 Scene setup
+    // 🎬 Create scene
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0x000000);
 
+    // 🎥 Setup camera
     const camera = new THREE.PerspectiveCamera(
       60,
       window.innerWidth / window.innerHeight,
@@ -35,34 +36,35 @@ export default function StrategyCoreShell() {
     );
     camera.position.set(0, 0.1, 3.2);
 
+    // 🌐 WebGL renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     mount.current.appendChild(renderer.domElement);
 
-    // 🌟 Postprocessing bloom
+    // ✨ Postprocessing
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
-
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
-      1.3,
-      0.4,
-      0.65
+    composer.addPass(
+      new UnrealBloomPass(
+        new THREE.Vector2(window.innerWidth, window.innerHeight),
+        1.3,
+        0.4,
+        0.65
+      )
     );
-    composer.addPass(bloomPass);
 
-    // 🧠 Core Spine
-    const beamGeometry = new THREE.PlaneGeometry(0.0625, 2.65, 1, 1);
+    // 🧠 Create spine
+    const beamGeometry = new THREE.PlaneGeometry(0.07, 2.75, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Emotion cycling
+    // 🔁 Auto emotion loop
     autoCycleEmotion(10000);
 
-    // 🎞️ Animation loop
+    // 🎞️ Animate frame
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
@@ -83,7 +85,7 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 📏 Responsive layout
+    // 📐 Resize listener
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
@@ -92,7 +94,7 @@ export default function StrategyCoreShell() {
     };
     window.addEventListener('resize', handleResize);
 
-    // 🧹 Cleanup
+    // 🧼 Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       mount.current.removeChild(renderer.domElement);
@@ -105,15 +107,15 @@ export default function StrategyCoreShell() {
       ref={mount}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
-      {/* Top/Bottom Fade Mask */}
+      {/* Fade Overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* Cognitive Overlays */}
+      {/* Cognitive UI */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* HUD: Finance Ticker */}
+      {/* HUD */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
