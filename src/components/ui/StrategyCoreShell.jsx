@@ -2,36 +2,30 @@
 
 import React, { useEffect, useRef } from "react";
 
-import GazeEyes from "./GazeEyes";
-import TypingPanel from "./TypingPanel";
-import InstitutionalOverlay from "./InstitutionalOverlay";
-import FinanceTicker from "./FinanceTicker";
+import GazeEyes from "./GazeEyes.jsx";
+import TypingPanel from "./TypingPanel.jsx";
+import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
+import FinanceTicker from "./FinanceTicker.jsx";
 
-import { getNeedPulse } from "../../systems/getNeedPulse";
-import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine";
+import { getNeedPulse } from "../../systems/getNeedPulse.js";
+import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine.js";
 
 export default function StrategyCoreShell() {
   const mount = useRef(null);
 
   useEffect(() => {
-    // 🔧 Your Three.js, shader, or Tone.js logic should go here.
-    // This is where your render loop would mount to `mount.current`.
+    // 🧠 Insert your Three.js + Tone.js logic here
   }, []);
 
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      {/* Gaze indicator */}
       <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2">
         <GazeEyes />
       </div>
 
-      {/* Input typing panel */}
       <TypingPanel />
-
-      {/* Central information display */}
       <InstitutionalOverlay />
 
-      {/* Bottom financial ticker */}
       <div className="pointer-events-none absolute bottom-2 w-full flex justify-center">
         <FinanceTicker />
       </div>
