@@ -5,7 +5,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
 import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
 
-import BeamRenderer from './BeamRenderer.jsx';
+import BeamRenderer from '../BeamRenderer.jsx'; // ✅ Fixed path
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
