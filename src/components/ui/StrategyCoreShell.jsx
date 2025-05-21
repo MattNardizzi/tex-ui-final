@@ -44,6 +44,7 @@ export default function StrategyCoreShell() {
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
+
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
@@ -52,7 +53,7 @@ export default function StrategyCoreShell() {
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
 
-        {/* Order matters: render ring first, then beam above it */}
+        {/* Ring first, beam second */}
         <CoreRing />
         <BeamRenderer />
       </Canvas>
