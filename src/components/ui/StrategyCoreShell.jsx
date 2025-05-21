@@ -11,8 +11,8 @@ import {
   getEmotionName,
   autoCycleEmotion,
 } from '@/systems/emotionEngine';
-import { createSpineShaderMaterial } from './SpineShaderMaterial';
 
+import { createSpineShaderMaterial } from './SpineShaderMaterial';
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
@@ -23,8 +23,9 @@ export default function StrategyCoreShell() {
   const lastEmotion = useRef(getEmotionName());
 
   useEffect(() => {
+    // Setup Scene
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // Pure sovereign void
+    scene.background = new THREE.Color(0x000000); // Sovereign void
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -40,49 +41,48 @@ export default function StrategyCoreShell() {
     mount.current.appendChild(renderer.domElement);
 
     const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+
     const bloomPass = new UnrealBloomPass(
       new THREE.Vector2(window.innerWidth, window.innerHeight),
-      1.3, // subtle but rich bloom
+      1.3, // Subtle but rich bloom
       0.4,
       0.65
     );
-    composer.addPass(new RenderPass(scene, camera));
     composer.addPass(bloomPass);
 
-    // 🧠 Core Beam
-    const beamGeometry = new THREE.PlaneGeometry(0.045, 2.25, 1, 1); // reduced height
+    // 🧠 Core Beam (slightly thicker)
+    const beamGeometry = new THREE.PlaneGeometry(0.0575, 2.25, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Emotions auto-cycling
+    // 🔁 Start Emotion Cycle
     autoCycleEmotion(10000);
 
-    // 🔄 Animate loop
+    // 🔄 Animation Loop
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
 
-      // Only lerp when emotion name changes (avoids bleed)
       const currentEmotion = getEmotionName();
-      const colorTarget = getEmotionGlowColor();
+      const targetColor = getEmotionGlowColor();
       const colorUniform = beamMaterial.uniforms.uColor.value;
 
       if (lastEmotion.current !== currentEmotion) {
         lastEmotion.current = currentEmotion;
-        colorUniform.lerp(colorTarget, 0.1);
+        colorUniform.lerp(targetColor, 0.1);
       } else {
-        colorUniform.lerp(colorTarget, 0.04);
+        colorUniform.lerp(targetColor, 0.04);
       }
-
-      // Optionally adjust bloom intensity by pulse or emotion (future)
 
       composer.render();
       requestAnimationFrame(animate);
     };
     animate();
 
+    // 📐 Handle Resize
     const handleResize = () => {
       renderer.setSize(window.innerWidth, window.innerHeight);
       composer.setSize(window.innerWidth, window.innerHeight);
@@ -91,6 +91,7 @@ export default function StrategyCoreShell() {
     };
     window.addEventListener('resize', handleResize);
 
+    // 🧹 Cleanup on Unmount
     return () => {
       window.removeEventListener('resize', handleResize);
       mount.current.removeChild(renderer.domElement);
@@ -103,10 +104,15 @@ export default function StrategyCoreShell() {
       ref={mount}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
+      {/* Top/Bottom Fade Overlay */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
+
+      {/* Overlays and Panels */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
+
+      {/* Finance HUD (Top Centered) */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
