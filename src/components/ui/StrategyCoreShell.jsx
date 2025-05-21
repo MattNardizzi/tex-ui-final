@@ -8,7 +8,7 @@ import GazeEyes from "./GazeEyes.jsx";
 import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
 import TypingPanel from "../TypingPanel.jsx";
-import BeamRenderer from "./BeamRenderer.jsx";
+import BeamRenderer from "../BeamRenderer.jsx"; // ✅ FIXED PATH
 
 // ✅ Systems
 import { getNeedPulse } from "../../systems/getNeedPulse.js";
@@ -18,7 +18,7 @@ export default function StrategyCoreShell() {
   const mount = useRef(null);
 
   useEffect(() => {
-    // Placeholder for shader/init logic if needed later
+    // Reserved for future shader mounts or cleanup
   }, []);
 
   return (
