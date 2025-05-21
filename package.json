@@ -9,8 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@react-three/drei": "^9.91.3",
-    "@react-three/fiber": "^9.1.2",
+    "@react-three/drei": "^9.58.5",
+    "@react-three/fiber": "^8.13.4",
+    "babel-plugin-glsl": "^1.0.0",
     "drei": "^2.2.21",
     "next": "15.3.2",
     "react": "18.3.1",
