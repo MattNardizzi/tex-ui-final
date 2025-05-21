@@ -20,14 +20,14 @@ export default function BeamRenderer() {
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-    const gain = getNeedPulse() || 0.5;
+    const gain = getNeedPulse() || 0.6;
 
     if (!beamRef.current?.material?.uniforms) return;
 
-    const u = beamRef.current.material.uniforms;
-    u.uTime.value = t;
-    u.uColor.value.lerp(new THREE.Color(emotionColor), 0.1);
-    u.uGain.value = gain;
+    const uniforms = beamRef.current.material.uniforms;
+    uniforms.uTime.value = t;
+    uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.1);
+    uniforms.uGain.value = gain;
   });
 
   return (
