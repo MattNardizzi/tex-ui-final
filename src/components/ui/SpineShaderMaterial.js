@@ -28,18 +28,25 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       float fresnel(vec2 uv) {
         vec2 center = vec2(0.5, 0.5);
         float dist = length(uv - center);
-        return pow(1.0 - dist, 2.2);
+        return pow(1.0 - dist, 2.8); // tighter core
       }
 
       float verticalFade(float y) {
-        // Makes top/bottom fade gentler — never disappears
-        float edge = smoothstep(1.2, 0.15, abs(y));
-        return mix(0.35, 1.0, edge); // 35% minimum opacity at edges
+        float fade = smoothstep(1.1, 0.1, abs(y));
+        return mix(0.4, 1.0, fade); // Always visible, fades near ends
       }
 
       void main() {
         float fadeY = verticalFade(vPosition.y);
-        float pulse = 0.55 + 0.45 * sin(uTime * 1.8); // slightly deeper pulse range
+
+        // Slow breathing pattern
+        float breath = 0.6 + 0.4 * sin(uTime * 1.2);
+
+        // Fast heartbeat pulse
+        float heartbeat = 0.9 + 0.1 * sin(uTime * 7.5);
+
+        float pulse = breath * heartbeat;
+
         float core = fresnel(vUv);
         float intensity = core * fadeY * pulse;
 
