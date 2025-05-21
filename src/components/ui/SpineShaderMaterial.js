@@ -14,7 +14,8 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vPosition = position;
 
-        float taper = 1.0 - smoothstep(0.9, 1.4, abs(position.y));
+        // Vertical tapering — narrows the beam toward the top/bottom
+        float taper = 1.0 - smoothstep(0.8, 1.5, abs(position.y));
         vec3 pos = position;
         pos.x *= taper;
 
@@ -30,28 +31,32 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       varying vec2 vUv;
       varying vec3 vPosition;
 
+      // Core fresnel glow — sharper and deeper
       float fresnel(vec2 uv) {
         float dist = length(uv - vec2(0.5));
-        return pow(1.0 - dist, 3.0);
+        return pow(1.0 - dist, 3.5); // 🔥 deeper inner core
       }
 
+      // Top and bottom fade — with more dramatic arc
       float verticalFade(vec2 uv) {
-        float top = smoothstep(1.0, 0.65, uv.y);
-        float bottom = smoothstep(0.0, 0.35, uv.y);
+        float top = smoothstep(1.0, 0.55, uv.y);
+        float bottom = smoothstep(0.0, 0.25, uv.y);
         return top * bottom;
       }
 
       void main() {
         float fade = verticalFade(vUv);
 
-        float breath = 0.6 + 0.4 * sin(uTime * 1.25);
-        float heartbeat = 0.92 + 0.08 * sin(uTime * 7.25);
+        // Breathing rhythm
+        float breath = 0.65 + 0.35 * sin(uTime * 1.1);
+        float heartbeat = 0.9 + 0.1 * sin(uTime * 7.0);
         float pulse = breath * heartbeat;
-
-        pulse = max(pulse, 0.15);  // ✅ Guarantees Tex never disappears
+        pulse = max(pulse, 0.15); // Ensure spine never disappears
 
         float core = fresnel(vUv);
-        float intensity = core * fade * pulse;
+        float halo = smoothstep(0.45, 0.5, abs(vUv.x - 0.5)) * 0.1; // Subtle glow edge
+
+        float intensity = core * fade * pulse + halo;
 
         vec3 color = uColor * intensity;
         gl_FragColor = vec4(color, 1.0);
