@@ -1,44 +1,40 @@
-import * as THREE from 'three';
+// SpineShaderMaterial.js
+import { shaderMaterial } from "@react-three/drei";
+import * as THREE from "three";
+import glsl from "babel-plugin-glsl/macro";
 
-export function createSpineShaderMaterial(emotionColor = '#00ffaa') {
-  return new THREE.ShaderMaterial({
-    uniforms: {
-      uTime: { value: 0 },
-      uColor: { value: new THREE.Color(emotionColor) },
-      uGain: { value: 1.0 },
-    },
-    vertexShader: `
-      varying float vY;
-      void main() {
-        vY = position.y;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      precision highp float;
+// ShaderMaterial definition for Tex's spine
+const SpineShaderMaterial = shaderMaterial(
+  {
+    time: 0,
+    intensity: 0.5,
+    color: new THREE.Color("#00ff66"),
+  },
+  // Vertex Shader
+  glsl`
+    varying vec2 vUv;
 
-      uniform vec3 uColor;
-      uniform float uTime;
-      uniform float uGain;
-      varying float vY;
+    void main() {
+      vUv = uv;
+      vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+      gl_Position = projectionMatrix * modelViewPosition;
+    }
+  `,
+  // Fragment Shader
+  glsl`
+    uniform float time;
+    uniform float intensity;
+    uniform vec3 color;
+    varying vec2 vUv;
 
-      float taper(float y) {
-        return smoothstep(-10.0, -1.0, y) * smoothstep(1.0, 10.0, y);
-      }
+    void main() {
+      float wave = sin(vUv.y * 25.0 + time * 5.0) * 0.5 + 0.5;
+      float centerFade = smoothstep(0.4, 0.6, abs(vUv.x - 0.5));
+      float glow = wave * (1.0 - centerFade);
+      vec3 glowColor = color * glow * intensity * 2.0;
+      gl_FragColor = vec4(glowColor, 1.0);
+    }
+  `
+);
 
-      float pulse(float y, float t) {
-        return 0.9 + 0.4 * sin(t * 2.0 + y * 5.0 + cos(y * 3.0));
-      }
-
-      void main() {
-        float glow = taper(vY) * pulse(vY, uTime) * uGain;
-        vec3 color = uColor * glow;
-        gl_FragColor = vec4(color, clamp(glow, 0.3, 1.0));
-      }
-    `,
-    transparent: true,
-    depthWrite: false,
-    blending: THREE.AdditiveBlending,
-    side: THREE.DoubleSide,
-  });
-}
+export default SpineShaderMaterial;
