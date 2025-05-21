@@ -11,8 +11,11 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       void main() {
         vUv = uv;
         vec3 pos = position;
+
+        // Subtle taper to give beam some dynamic shape
         float taper = 1.0 - smoothstep(3.0, 3.6, abs(pos.y));
         pos.x *= taper;
+
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
       }
     `,
@@ -22,30 +25,36 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       uniform float uTime;
       varying vec2 vUv;
 
-      float fresnel(vec2 uv) {
-        float d = length(uv - vec2(0.5));
-        return pow(1.0 - d, 16.0); // crisper core beam
+      float coreLine(vec2 uv) {
+        float d = abs(uv.x - 0.5);
+        return 1.0 - smoothstep(0.01, 0.02, d); // thinner, cleaner line
+      }
+
+      float pulseMod() {
+        return 0.95 + 0.05 * sin(uTime * 3.0);
       }
 
       float verticalFade(vec2 uv) {
-        float top = smoothstep(0.98, 0.4, uv.y);
+        float top = smoothstep(0.98, 0.45, uv.y);
         float bottom = smoothstep(0.02, 0.5, uv.y);
         return top * bottom;
       }
 
       void main() {
-        float pulse = 0.85 + 0.15 * sin(uTime * 1.5);
+        float line = coreLine(vUv);
         float fade = verticalFade(vUv);
-        float core = fresnel(vUv);
-        float intensity = core * fade * pulse;
+        float pulse = pulseMod();
 
+        float intensity = line * fade * pulse;
         vec3 color = uColor * intensity;
-        gl_FragColor = vec4(color, 0.2 + intensity * 0.8);
+
+        // FORCE sharp beam: kill all blur by matching alpha to intensity
+        gl_FragColor = vec4(color, clamp(intensity, 0.4, 1.0));
       }
     `,
-    side: THREE.DoubleSide,
     transparent: true,
     depthWrite: false,
     blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide,
   });
 }
