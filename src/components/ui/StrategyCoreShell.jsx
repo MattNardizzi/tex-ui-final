@@ -23,14 +23,14 @@ function CoreRing() {
       materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
       materialRef.current.uniforms.uColor.value.lerp(
         new THREE.Color(emotionColor),
-        0.04
+        0.05
       );
     }
   });
 
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
-      <ringGeometry args={[0.12, 0.24, 128]} />
+    <mesh rotation-x={-Math.PI / 2} position={[0, -0.3, 0]}>
+      <ringGeometry args={[0.15, 0.28, 128]} />
       <shaderMaterial
         ref={materialRef}
         args={[createCoreRingShaderMaterial(emotionColor)]}
@@ -51,8 +51,10 @@ export default function StrategyCoreShell() {
       >
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
-        <BeamRenderer />
+
+        {/* Order matters: render ring first, then beam above it */}
         <CoreRing />
+        <BeamRenderer />
       </Canvas>
 
       <TypingPanel />
