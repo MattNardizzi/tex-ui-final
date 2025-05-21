@@ -2,13 +2,11 @@
 
 import React, { useEffect, useRef } from "react";
 
-// ✅ UI components
 import GazeEyes from "./GazeEyes.jsx";
+import TypingPanel from "../TypingPanel.jsx"; // ✅ CORRECTED PATH
 import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
-import TypingPanel from "../TypingPanel.jsx"; // ← Corrected path (TypingPanel is in parent folder)
 
-// ✅ System logic
 import { getNeedPulse } from "../../systems/getNeedPulse.js";
 import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine.js";
 
