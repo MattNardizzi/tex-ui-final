@@ -13,34 +13,27 @@ export default function BeamRenderer() {
   const { emotionColor } = useEmotion();
 
   useEffect(() => {
-    if (beamRef.current) {
+    if (beamRef.current && beamRef.current.material) {
       beamRef.current.material = createSpineShaderMaterial(emotionColor);
     }
   }, [emotionColor]);
 
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
-
-    if (
-      !beamRef.current ||
-      !beamRef.current.material ||
-      !beamRef.current.material.uniforms
-    ) return;
-
-    beamRef.current.material.uniforms.uTime.value = t;
-
-    beamRef.current.material.uniforms.uColor.value.lerp(
-      new THREE.Color(emotionColor),
-      0.05
-    );
-
     const gain = getNeedPulse();
-    if (
-      typeof gain === 'number' &&
-      !isNaN(gain) &&
-      beamRef.current.material.uniforms.uGain
-    ) {
-      beamRef.current.material.uniforms.uGain.value = gain;
+
+    if (!beamRef.current?.material?.uniforms) return;
+
+    const uniforms = beamRef.current.material.uniforms;
+
+    uniforms.uTime.value = t;
+
+    if (uniforms.uColor && emotionColor) {
+      uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
+    }
+
+    if (uniforms.uGain && typeof gain === 'number' && !isNaN(gain)) {
+      uniforms.uGain.value = gain;
     }
   });
 
@@ -50,7 +43,7 @@ export default function BeamRenderer() {
       position={[0, 1.35, 0]}
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.44, 3.4]} /> {/* ⬅️ Widened for real presence */}
+      <planeGeometry args={[0.44, 3.4]} />
     </mesh>
   );
 }
