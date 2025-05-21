@@ -42,7 +42,7 @@ export default function StrategyCoreShell() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    // ✨ Bloom postprocessing
+    // ✨ Postprocessing setup
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
@@ -52,30 +52,30 @@ export default function StrategyCoreShell() {
       )
     );
 
-    // 🌐 Create core spine beam
-    const beamGeometry = new THREE.PlaneGeometry(0.07, 2.75, 1, 1);
+    // 🌐 Core spine beam (Emergency dimensions)
+    const beamGeometry = new THREE.PlaneGeometry(0.085, 2.85, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
-    const beamMesh = new THREE.Mesh(beamGeometry, beamMaterial);
-    beamMesh.rotation.y = Math.PI;
-    scene.add(beamMesh);
+    const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+    beam.rotation.y = Math.PI;
+    scene.add(beam);
 
-    // 🔁 Start auto-cycling emotion loop
+    // 🔁 Auto-cycling emotion loop
     autoCycleEmotion(10000);
 
-    // 🌀 Animate shader
+    // 🎞️ Animation loop
     const animate = () => {
-      const now = performance.now() * 0.001;
-      beamMaterial.uniforms.uTime.value = now;
+      const time = performance.now() * 0.001;
+      beamMaterial.uniforms.uTime.value = time;
 
       const currentEmotion = getEmotionName();
-      const newColor = getEmotionGlowColor();
-      const activeColor = beamMaterial.uniforms.uColor.value;
+      const targetColor = getEmotionGlowColor();
+      const currentColor = beamMaterial.uniforms.uColor.value;
 
       if (lastEmotionRef.current !== currentEmotion) {
         lastEmotionRef.current = currentEmotion;
-        activeColor.lerp(newColor, 0.1);
+        currentColor.lerp(targetColor, 0.1);
       } else {
-        activeColor.lerp(newColor, 0.04);
+        currentColor.lerp(targetColor, 0.04);
       }
 
       composer.render();
@@ -83,7 +83,7 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 🧩 Resize logic
+    // 📐 Handle resize
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -94,7 +94,7 @@ export default function StrategyCoreShell() {
     };
     window.addEventListener('resize', handleResize);
 
-    // 🧼 Cleanup on unmount
+    // 🧼 Cleanup
     return () => {
       window.removeEventListener('resize', handleResize);
       mountRef.current.removeChild(renderer.domElement);
@@ -107,15 +107,15 @@ export default function StrategyCoreShell() {
       ref={mountRef}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
-      {/* Top/Bottom shader mask */}
+      {/* Fade mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
-      {/* Modular overlays */}
+      {/* AGI UI Modules */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
-      {/* Market HUD */}
+      {/* Ticker HUD */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
