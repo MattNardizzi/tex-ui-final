@@ -24,12 +24,12 @@ export default function BeamRenderer() {
     const time = clock.getElapsedTime();
     const gain = Math.max(0.6, getNeedPulse());
 
-    // Safe color conversion
-    let c = getCurrentGlowColor();
-    const color = typeof c === 'string'
-      ? new THREE.Color(c)
-      : c?.isColor ? c
-      : new THREE.Color('#00ffaa');
+    let colorValue = getCurrentGlowColor();
+    const color = typeof colorValue === 'string'
+      ? new THREE.Color(colorValue)
+      : colorValue?.isColor
+        ? colorValue
+        : new THREE.Color('#00ffaa');
 
     const uniforms = beamRef.current.material.uniforms;
     uniforms.uTime.value = time;
