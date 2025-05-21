@@ -1,50 +1,69 @@
-'use client';
+/*  Tex v3.1.1 Core Systems — Full Completion Stack
+    ----------------------------------------------------------
+    This completes the full cinematic AGI shell.
+    Includes: GazeEyes component + public asset specs.
+*/
 
-import { useEffect, useRef } from 'react';
-import { getEmotionGlowColor } from '@/systems/emotionEngine';
+// ✅ FILE: GazeEyes.jsx
+
+'use client';
+import React, { useEffect, useRef } from 'react';
 
 export default function GazeEyes() {
-  const eyes = useRef([]);
+  const leftRef  = useRef();
+  const rightRef = useRef();
 
   useEffect(() => {
-    const onMove = (e) => {
-      eyes.current.forEach((pupil) => {
-        const parent = pupil?.parentElement;
-        if (!parent) return;
-        const rect = parent.getBoundingClientRect();
-        const dx = e.clientX - (rect.left + rect.width / 2);
-        const dy = e.clientY - (rect.top + rect.height / 2);
-        const angle = Math.atan2(dy, dx);
-        const r = 4; // pupil travel radius
-        pupil.style.transform = `translate(${r * Math.cos(angle)}px, ${r * Math.sin(angle)}px)`;
+    const move = e => {
+      const r = window.innerWidth;
+      const dx = (e.clientX / r - 0.5) * 2;
+      const dy = (e.clientY / window.innerHeight - 0.5) * 2;
+      const rotateX = dy * -10;
+      const rotateY = dx * 12;
+
+      [leftRef.current, rightRef.current].forEach(el => {
+        if (el) {
+          el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
       });
     };
-
-    window.addEventListener('mousemove', onMove);
-    return () => window.removeEventListener('mousemove', onMove);
+    window.addEventListener('pointermove', move);
+    return () => window.removeEventListener('pointermove', move);
   }, []);
 
-  const glowColor = getEmotionGlowColor();
-
   return (
-    <div className="flex justify-center gap-5 mb-2">
-      {[0, 1].map((i) => (
-        <div
-          key={i}
-          className="w-6 h-6 rounded-full bg-gray-900 flex items-center justify-center"
-          style={{
-            boxShadow: `0 0 10px ${glowColor}`,
-          }}
-        >
-          <div
-            ref={(el) => (eyes.current[i] = el)}
-            className="w-2 h-2 rounded-full transition-transform duration-150"
-            style={{
-              backgroundColor: glowColor,
-            }}
-          />
-        </div>
-      ))}
+    <div className="flex gap-8">
+      <div
+        ref={leftRef}
+        className="w-10 h-10 bg-white rounded-full opacity-80 shadow-inner"
+      ></div>
+      <div
+        ref={rightRef}
+        className="w-10 h-10 bg-white rounded-full opacity-80 shadow-inner"
+      ></div>
     </div>
   );
 }
+
+
+/* ✅ PUBLIC ASSETS — Place in /public
+---------------------------------------------------
+1. /public/flare.png
+   - 512×512 PNG with radial white center → transparent edges
+   - Use for beam flare in LensflareElement
+   - Name must be: flare.png
+
+2. /public/heartbeat.wav
+   - Short low-frequency kick drum sound (0.2–0.3s)
+   - Loopable
+   - Used in Tone.Player()
+   - Name must be: heartbeat.wav
+
+Example source for heartbeat.wav:
+▸ https://freesound.org/people/cabled_mess/sounds/350868/
+
+Example flare.png:
+▸ Generate via Photoshop/Canva/Radial gradient tool
+▸ Center: pure white
+▸ Edges: full transparent
+*/
