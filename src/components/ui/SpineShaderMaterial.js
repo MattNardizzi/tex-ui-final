@@ -22,7 +22,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       varying float vY;
 
       float taper(float y) {
-        return smoothstep(-1.6, -2.0, y) * smoothstep(2.0, 1.6, y);
+        return smoothstep(-4.2, -4.6, y) * smoothstep(4.6, 4.2, y);
       }
 
       float pulse(float y, float t) {
