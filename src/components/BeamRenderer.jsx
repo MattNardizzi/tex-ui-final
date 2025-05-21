@@ -35,10 +35,10 @@ export default function BeamRenderer() {
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.6, 0]} // ✅ Floats above ring
+      position={[0, 1.2, 0]} // ⬇️ Lowered for better ring separation
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.12, 3.2]} />
+      <planeGeometry args={[0.28, 3.2]} /> {/* ⬅️ Thicker beam width */}
     </mesh>
   );
 }
