@@ -6,57 +6,28 @@ import { PerspectiveCamera } from '@react-three/drei';
 import * as THREE from 'three';
 
 import { useEmotion } from '@/systems/emotionEngine';
-import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
-
-import TypingPanel from '../TypingPanel';
 import BeamRenderer from '../BeamRenderer.jsx';
-import InstitutionalOverlay from './InstitutionalOverlay';
-import FinanceTicker from './FinanceTicker';
-import MutationOverlay from '../MutationOverlay';
-
-function CoreRing() {
-  const materialRef = useRef();
-  const { emotionColor } = useEmotion();
-
-  useFrame(({ clock }) => {
-    if (!materialRef.current?.uniforms) return;
-    materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
-    materialRef.current.uniforms.uColor.value.lerp(new THREE.Color(emotionColor), 0.05);
-  });
-
-  return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -0.3, 0]}>
-      <ringGeometry args={[0.15, 0.28, 128]} />
-      <shaderMaterial
-        ref={materialRef}
-        args={[createCoreRingShaderMaterial(emotionColor)]}
-        attach="material"
-      />
-    </mesh>
-  );
-}
 
 export default function StrategyCoreShell() {
+  const cameraRef = useRef();
+  const { emotionColor } = useEmotion();
+
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        camera={{ position: [0, 1.1, 4.2], fov: 60 }}
+        camera={{ position: [0, 1.35, 4.5], fov: 50 }}
       >
-        <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
-        <ambientLight intensity={0.1} />
-        <CoreRing />
+        <PerspectiveCamera
+          makeDefault
+          ref={cameraRef}
+          position={[0, 1.35, 4.5]}
+          fov={50}
+        />
+        <ambientLight intensity={0.25} color={emotionColor} />
         <BeamRenderer />
       </Canvas>
-
-      <TypingPanel />
-      <InstitutionalOverlay />
-      <MutationOverlay />
-
-      <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
-        <FinanceTicker />
-      </div>
     </div>
   );
 }
