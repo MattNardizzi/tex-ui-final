@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useRef, useEffect } from 'react';
@@ -13,8 +12,7 @@ export default function BeamRenderer() {
 
   useEffect(() => {
     if (beamRef.current) {
-      const material = createSpineShaderMaterial(emotionColor);
-      beamRef.current.material = material;
+      beamRef.current.material = createSpineShaderMaterial(emotionColor);
     }
   }, [emotionColor]);
 
@@ -38,7 +36,6 @@ export default function BeamRenderer() {
       rotation-x={-Math.PI / 2}
     >
       <planeGeometry args={[0.12, 3.2]} />
-      <shaderMaterial attach="material" />
     </mesh>
   );
 }
