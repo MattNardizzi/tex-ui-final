@@ -7,17 +7,40 @@ import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
 import TypingPanel from "../TypingPanel.jsx";
 
+// ✅ Inline spine CSS (for pulse-spine)
+const spineStyles = `
+  @keyframes pulse-spine {
+    0%, 100% {
+      opacity: 0.4;
+      transform: scaleY(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scaleY(1.03);
+    }
+  }
+  .animate-pulse-spine {
+    animation: pulse-spine 2.4s ease-in-out infinite;
+  }
+`;
+
 export default function StrategyCoreShell() {
   const mountRef = useRef(null);
 
   useEffect(() => {
-    // Reserved for future hooks
+    // Inject spine animation if not already present
+    if (!document.getElementById('spine-animation-style')) {
+      const style = document.createElement('style');
+      style.id = 'spine-animation-style';
+      style.innerHTML = spineStyles;
+      document.head.appendChild(style);
+    }
   }, []);
 
   return (
     <div ref={mountRef} className="relative w-screen h-screen bg-black overflow-hidden font-mono">
 
-      {/* ✅ Glowing Vertical CSS Spine */}
+      {/* ✅ Glowing Vertical Spine */}
       <div className="absolute left-1/2 top-0 h-full w-[2px] -translate-x-1/2 z-10">
         <div className="w-full h-full bg-gradient-to-b from-green-400 via-green-300 to-transparent animate-pulse-spine opacity-80" />
       </div>
