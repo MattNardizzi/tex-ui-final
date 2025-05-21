@@ -12,6 +12,8 @@ import {
 } from '@/systems/emotionEngine';
 
 import { createSpineShaderMaterial } from './SpineShaderMaterial';
+import { createCoreRingShaderMaterial } from './CoreRingShaderMaterial';
+
 import TypingPanel from '../TypingPanel';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
@@ -47,10 +49,10 @@ function SpineBeam() {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 1.3, 0]} // ✅ Centered
+      position={[0, 1.3, 0]} // ✅ Visible in center frame
       rotation-x={-Math.PI / 2}
     >
-      <planeGeometry args={[0.1, 3.2]} /> {/* ✅ Thicker + taller */}
+      <planeGeometry args={[0.1, 3.2]} />
       <shaderMaterial
         ref={materialRef}
         args={[createSpineShaderMaterial(getEmotionGlowColor())]}
@@ -61,14 +63,22 @@ function SpineBeam() {
 }
 
 function CoreRing() {
+  const meshRef = useRef();
+  const materialRef = useRef();
+
+  useFrame(({ clock }) => {
+    if (materialRef.current) {
+      materialRef.current.uniforms.uTime.value = clock.getElapsedTime();
+    }
+  });
+
   return (
-    <mesh rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
+    <mesh ref={meshRef} rotation-x={-Math.PI / 2} position={[0, -0.2, 0]}>
       <ringGeometry args={[0.1, 0.17, 64]} />
-      <meshBasicMaterial
-        color={new THREE.Color('#00faff')}
-        transparent
-        opacity={0.15}
-        side={THREE.DoubleSide}
+      <shaderMaterial
+        ref={materialRef}
+        args={[createCoreRingShaderMaterial('#00faff')]}
+        attach="material"
       />
     </mesh>
   );
@@ -82,7 +92,7 @@ export default function StrategyCoreShell() {
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        camera={{ position: [0, 1.1, 4.2], fov: 60 }} // ✅ More balanced distance
+        camera={{ position: [0, 1.1, 4.2], fov: 60 }}
       >
         <PerspectiveCamera makeDefault position={[0, 1.1, 4.2]} />
         <ambientLight intensity={0.1} />
