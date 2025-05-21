@@ -12,40 +12,38 @@ export default function BeamRenderer() {
   const beamRef = useRef();
 
   useEffect(() => {
-    const initialColor = new THREE.Color('#00ff88');
-    const mat = createSpineShaderMaterial(initialColor);
+    const mat = createSpineShaderMaterial('#00ffaa');
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
   }, []);
 
   useFrame(({ clock }) => {
+    if (!beamRef.current?.material?.uniforms) return;
+
     const time = clock.getElapsedTime();
     const gain = Math.max(0.6, getNeedPulse());
 
-    // Ensure valid THREE.Color
-    const colorValue = getCurrentGlowColor();
-    const color = typeof colorValue === 'string'
-      ? new THREE.Color(colorValue)
-      : colorValue instanceof THREE.Color
-        ? colorValue
-        : new THREE.Color('#00ffaa');
+    // Safe color conversion
+    let c = getCurrentGlowColor();
+    const color = typeof c === 'string'
+      ? new THREE.Color(c)
+      : c?.isColor ? c
+      : new THREE.Color('#00ffaa');
 
-    if (!beamRef.current?.material?.uniforms) return;
-
-    const u = beamRef.current.material.uniforms;
-    u.uTime.value = time;
-    u.uGain.value = gain;
-    u.uColor.value.lerp(color, 0.05);
+    const uniforms = beamRef.current.material.uniforms;
+    uniforms.uTime.value = time;
+    uniforms.uGain.value = gain;
+    uniforms.uColor.value.lerp(color, 0.1);
   });
 
   return (
     <>
       <ambientLight intensity={1.2} />
-      <pointLight position={[0, 0, 4]} intensity={4} color="#ffffff" />
+      <pointLight position={[0, 0, 5]} intensity={3} color="#00ffaa" />
 
       <mesh ref={beamRef} position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.03, 0.03, 20, 64, 1, true]} />
+        <cylinderGeometry args={[0.04, 0.04, 20, 64, 1, true]} />
       </mesh>
     </>
   );
