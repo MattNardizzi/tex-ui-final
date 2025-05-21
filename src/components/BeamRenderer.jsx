@@ -3,12 +3,13 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { useEmotion } from '@/systems/emotionEngine';
-import { createSpineShaderMaterial } from './ui/SpineShaderMaterial'; // ✅ Fixed path
+import { createSpineShaderMaterial } from './ui/SpineShaderMaterial'; // ✅ Correct path
 
 export default function BeamRenderer() {
   const beamRef = useRef();
-  const { emotionColor } = useEmotion();
+
+  // ✅ Fallback color while useEmotion is unavailable
+  const emotionColor = '#00faff';
 
   useEffect(() => {
     if (beamRef.current) {
