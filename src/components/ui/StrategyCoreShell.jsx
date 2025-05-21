@@ -10,7 +10,7 @@ import { createNoise2D } from 'simplex-noise';
 import { getNeedPulse } from '@/systems/needPulse';
 import { getEmotionGlowColor, getEmotionPulseRate } from '@/systems/emotionEngine';
 
-import TypingPanel from './TypingPanel';
+import TypingPanel from './TypingPanel.jsx';
 import InstitutionalOverlay from './InstitutionalOverlay';
 import FinanceTicker from './FinanceTicker';
 import GazeEyes from './GazeEyes';
