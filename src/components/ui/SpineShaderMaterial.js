@@ -12,7 +12,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vec3 pos = position;
 
-        // Subtle taper to give beam some dynamic shape
+        // Slight taper for shape
         float taper = 1.0 - smoothstep(3.0, 3.6, abs(pos.y));
         pos.x *= taper;
 
@@ -27,11 +27,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
 
       float coreLine(vec2 uv) {
         float d = abs(uv.x - 0.5);
-        return 1.0 - smoothstep(0.01, 0.02, d); // thinner, cleaner line
-      }
-
-      float pulseMod() {
-        return 0.95 + 0.05 * sin(uTime * 3.0);
+        return 1.0 - smoothstep(0.01, 0.02, d);
       }
 
       float verticalFade(vec2 uv) {
@@ -40,16 +36,19 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         return top * bottom;
       }
 
+      float pulseShimmer(float y) {
+        return 0.9 + 0.1 * sin(uTime * 2.5 + y * 10.0);
+      }
+
       void main() {
         float line = coreLine(vUv);
         float fade = verticalFade(vUv);
-        float pulse = pulseMod();
+        float pulse = pulseShimmer(vUv.y);
 
-        float intensity = line * fade * pulse * 1.2;
+        float intensity = line * fade * pulse * 1.4;
         vec3 color = uColor * intensity;
 
-        // Final clamp for alpha control
-        gl_FragColor = vec4(color, clamp(intensity, 0.6, 1.0));
+        gl_FragColor = vec4(color, clamp(intensity, 0.65, 1.0));
       }
     `,
     transparent: true,
