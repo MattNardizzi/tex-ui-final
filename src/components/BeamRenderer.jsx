@@ -11,38 +11,33 @@ import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 export default function BeamRenderer() {
   const beamRef = useRef();
 
-  // Initialize shader material
   useEffect(() => {
-    const initialColor = getCurrentGlowColor();
-    const mat = createSpineShaderMaterial(initialColor);
+    const mat = createSpineShaderMaterial(new THREE.Color('#00ff88')); // bright teal fallback
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
   }, []);
 
-  // Animate spine pulse and color
   useFrame(({ clock }) => {
-    const time = clock.getElapsedTime();
-    const pulseGain = getNeedPulse();
-    const targetColor = getCurrentGlowColor();
+    const t = clock.getElapsedTime();
+    const gain = Math.max(0.6, getNeedPulse()); // force strong visibility
+    const color = getCurrentGlowColor();
 
     if (!beamRef.current?.material?.uniforms) return;
 
     const u = beamRef.current.material.uniforms;
-    u.uTime.value = time;
-    u.uGain.value = pulseGain;
-    u.uColor.value.lerp(targetColor, 0.05);
+    u.uTime.value = t;
+    u.uGain.value = gain;
+    u.uColor.value.lerp(color, 0.1);
   });
 
   return (
     <>
-      {/* Lighting for atmospheric glow */}
-      <ambientLight intensity={0.6} />
-      <pointLight position={[0, 0, 2]} intensity={3} color="#00ffaa" />
+      <ambientLight intensity={1.0} />
+      <pointLight position={[0, 0, 5]} intensity={4} color="#00ffaa" />
 
-      {/* Glowing vertical beam */}
       <mesh ref={beamRef} position={[0, 0, 0]}>
-        <cylinderGeometry args={[0.015, 0.015, 10, 64, 1, true]} />
+        <cylinderGeometry args={[0.05, 0.05, 12, 64, 1, true]} />
       </mesh>
     </>
   );
