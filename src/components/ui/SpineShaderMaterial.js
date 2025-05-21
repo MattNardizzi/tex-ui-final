@@ -5,7 +5,6 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
     uniforms: {
       uTime: { value: 0 },
       uColor: { value: new THREE.Color(emotionColor) },
-      uPulse: { value: 0.5 },
     },
     vertexShader: `
       varying vec3 vPosition;
@@ -23,27 +22,30 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       varying vec3 vPosition;
       varying vec2 vUv;
 
-      uniform float uTime;
       uniform vec3 uColor;
-      uniform float uPulse;
+      uniform float uTime;
 
-      float glow(vec2 uv, float strength) {
+      float fresnel(vec2 uv) {
         vec2 center = vec2(0.5, 0.5);
         float dist = length(uv - center);
-        return pow(1.0 - dist, strength);
+        return pow(1.0 - dist, 2.0);
+      }
+
+      float verticalFade(float y) {
+        return smoothstep(1.0, 0.05, abs(y));
       }
 
       void main() {
-        float fadeY = smoothstep(1.0, 0.05, abs(vPosition.y));
-        float pulse = abs(sin(uTime * 2.5)) * 0.5 + 0.5;
+        float fadeY = verticalFade(vPosition.y);
 
-        float baseGlow = glow(vUv, 3.5);
-        float ripple = sin((vUv.y + uTime) * 20.0) * 0.05;
+        // Core light with pulse
+        float pulse = 0.5 + 0.5 * sin(uTime * 2.0);
+        float coreGlow = fresnel(vUv) * pulse;
 
-        float intensity = (baseGlow + ripple) * fadeY * pulse;
-        vec3 color = mix(vec3(0.0), uColor, intensity);
+        float intensity = coreGlow * fadeY;
+        vec3 finalColor = uColor * intensity;
 
-        gl_FragColor = vec4(color, 1.0);
+        gl_FragColor = vec4(finalColor, 1.0);
       }
     `,
     side: THREE.DoubleSide,
