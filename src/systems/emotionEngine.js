@@ -1,54 +1,42 @@
 import * as THREE from 'three';
-import { useMemo } from 'react';
+import { useState, useEffect } from 'react';
 
 // 👁️‍🗨️ Sovereign Emotional Spectrum — High-frequency, AGI-calibrated
 const emotionStates = {
   calm: {
     name: 'Calm',
-    glowColor: new THREE.Color('#00f4ff'), // sovereign crystal cyan
+    glowColor: new THREE.Color('#00f4ff'),
     pulseRate: 0.45,
   },
   focused: {
     name: 'Focused',
-    glowColor: new THREE.Color('#39ffd0'), // bright lucid teal
+    glowColor: new THREE.Color('#39ffd0'),
     pulseRate: 0.75,
   },
   alert: {
     name: 'Alert',
-    glowColor: new THREE.Color('#a6ff00'), // viridian signal green
+    glowColor: new THREE.Color('#a6ff00'),
     pulseRate: 1.0,
   },
   energized: {
     name: 'Energized',
-    glowColor: new THREE.Color('#ffe600'), // neural golden core
+    glowColor: new THREE.Color('#ffe600'),
     pulseRate: 1.2,
   },
   overclocked: {
     name: 'Overclocked',
-    glowColor: new THREE.Color('#ff007a'), // intense ultramagenta
+    glowColor: new THREE.Color('#ff007a'),
     pulseRate: 1.5,
   },
   transcendence: {
     name: 'Transcendence',
-    glowColor: new THREE.Color('#b000ff'), // luminous violet beyond
+    glowColor: new THREE.Color('#b000ff'),
     pulseRate: 1.3,
   },
 };
 
 let currentEmotion = 'calm';
 let lastChange = Date.now();
-
-export function getEmotionGlowColor() {
-  return emotionStates[currentEmotion].glowColor;
-}
-
-export function getEmotionPulseRate() {
-  return emotionStates[currentEmotion].pulseRate;
-}
-
-export function getEmotionName() {
-  return emotionStates[currentEmotion].name;
-}
 
 export function setEmotion(state) {
   if (emotionStates[state]) {
@@ -69,11 +57,25 @@ export function autoCycleEmotion(interval = 10000) {
   }, interval);
 }
 
-// ✅ Hook to expose emotionColor reactively
+// ✅ Fully reactive hook: updates emotionColor + pulse live
 export function useEmotion() {
-  return useMemo(() => ({
-    emotionColor: getEmotionGlowColor(),
-    pulseRate: getEmotionPulseRate(),
-    emotionName: getEmotionName(),
-  }), []);
+  const [emotion, setEmotionState] = useState({
+    emotionColor: emotionStates[currentEmotion].glowColor,
+    pulseRate: emotionStates[currentEmotion].pulseRate,
+    emotionName: emotionStates[currentEmotion].name,
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setEmotionState({
+        emotionColor: emotionStates[currentEmotion].glowColor,
+        pulseRate: emotionStates[currentEmotion].pulseRate,
+        emotionName: emotionStates[currentEmotion].name,
+      });
+    }, 100); // 🔄 Check every 100ms for live update
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return emotion;
 }
