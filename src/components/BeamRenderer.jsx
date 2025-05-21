@@ -5,7 +5,7 @@ import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 
 import { useEmotion } from '@/systems/emotionEngine';
-import { getNeedPulse } from '@/systems/needPulse'; // ✅ Injected real-time pulse logic
+import { getNeedPulse } from '@/systems/needPulse';
 import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 
 export default function BeamRenderer() {
@@ -34,17 +34,23 @@ export default function BeamRenderer() {
       0.05
     );
 
-    // 👇 Real-time pulse from cognition
-    beamRef.current.material.uniforms.uGain.value = getNeedPulse();
+    const gain = getNeedPulse();
+    if (
+      typeof gain === 'number' &&
+      !isNaN(gain) &&
+      beamRef.current.material.uniforms.uGain
+    ) {
+      beamRef.current.material.uniforms.uGain.value = gain;
+    }
   });
 
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.35, 0]} // Lifted above the ring
+      position={[0, 1.35, 0]}
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.36, 3.4]} />
+      <planeGeometry args={[0.44, 3.4]} /> {/* ⬅️ Widened for real presence */}
     </mesh>
   );
 }
