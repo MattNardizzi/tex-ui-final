@@ -8,15 +8,14 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       uGain: { value: 1.0 },
     },
     vertexShader: `
-      varying vec2 vUv;
+      varying float vY;
+      varying vec3 vPosition;
+
       void main() {
-        vUv = uv;
-        vec3 pos = position;
+        vY = position.y;
+        vPosition = position;
 
-        float taper = 1.0 - smoothstep(2.2, 3.6, abs(pos.y)); // softened + fuller
-        pos.x *= taper;
-
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
       }
     `,
     fragmentShader: `
@@ -25,35 +24,27 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
       uniform vec3 uColor;
       uniform float uTime;
       uniform float uGain;
-      varying vec2 vUv;
 
-      float coreLine(vec2 uv) {
-        float d = abs(uv.x - 0.5);
-        float edge = smoothstep(0.012, 0.028, d);       // slightly thicker center
-        float falloff = smoothstep(0.05, 0.08, d);      // outer soft glow
-        return (1.0 - edge) * (1.0 - falloff);
-      }
+      varying float vY;
+      varying vec3 vPosition;
 
-      float verticalFade(vec2 uv) {
-        float top = pow(smoothstep(1.0, 0.5, uv.y), 2.2);
-        float bottom = pow(smoothstep(0.0, 0.3, uv.y), 2.2);
+      float taper(float y) {
+        float top = smoothstep(1.6, 1.2, y);
+        float bottom = smoothstep(-1.2, -1.6, y);
         return top * bottom;
       }
 
-      float pulseShimmer(vec2 uv) {
-        float wave = sin(uTime * 3.0 + uv.y * 20.0 + cos(uv.x * 25.0 + uTime * 0.5));
-        return 0.88 + 0.15 * wave;
+      float pulse(float y, float time) {
+        return 0.8 + 0.2 * sin(time * 4.0 + y * 8.0 + cos(y * 10.0 + time * 0.5));
       }
 
       void main() {
-        float line = coreLine(vUv);
-        float fade = verticalFade(vUv);
-        float pulse = pulseShimmer(vUv);
+        float taperVal = taper(vY);
+        float pulseVal = pulse(vY, uTime);
+        float intensity = taperVal * pulseVal * uGain;
 
-        float intensity = line * fade * pulse * uGain * 2.3;
-        vec3 color = uColor * intensity;
-
-        gl_FragColor = vec4(color, clamp(intensity, 0.75, 1.0));
+        vec3 glow = uColor * intensity * 1.5;
+        gl_FragColor = vec4(glow, clamp(intensity, 0.3, 1.0));
       }
     `,
     transparent: true,
