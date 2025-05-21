@@ -20,7 +20,7 @@ export default function StrategyCoreShell() {
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000);
+    scene.background = new THREE.Color(0x000000); // pure black
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -40,57 +40,24 @@ export default function StrategyCoreShell() {
     composer.addPass(
       new UnrealBloomPass(
         new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.5, // intensity
-        0.5,
-        0.85
+        1.2, // slightly reduced bloom intensity for clarity
+        0.4,
+        0.7
       )
     );
 
-    // 🧠 Sovereign Cognition Spine
-    const beamGeometry = new THREE.PlaneGeometry(0.03, 3.2, 1, 1);
+    // 🧠 AGI Plasma Spine
+    const beamGeometry = new THREE.PlaneGeometry(0.045, 3.0, 1, 1); // slightly thicker and shorter
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 💿 Base Emitter Ring
-    const ringGeometry = new THREE.RingGeometry(0.2, 0.4, 64);
-    const ringMaterial = new THREE.MeshBasicMaterial({
-      color: '#00faff',
-      transparent: true,
-      opacity: 0.15,
-      side: THREE.DoubleSide,
-    });
-    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-    ring.rotation.x = -Math.PI / 2;
-    ring.position.y = -1.6;
-    scene.add(ring);
-
-    // 🌌 Energy Shell Field
-    const field = new THREE.Mesh(
-      new THREE.SphereGeometry(2.8, 64, 64),
-      new THREE.MeshBasicMaterial({
-        color: '#003344',
-        transparent: true,
-        opacity: 0.05,
-        wireframe: true,
-        depthWrite: false,
-      })
-    );
-    scene.add(field);
-
-    // ✨ Animate Spine, Ring & Field
+    // ✨ Animate Spine
     const animate = () => {
       const t = performance.now() * 0.001;
-
       beamMaterial.uniforms.uTime.value = t;
       beamMaterial.uniforms.uColor.value.set(getEmotionGlowColor());
-
-      ring.rotation.z = t * 0.2;
-      ring.material.opacity = 0.15 + Math.sin(t * 2) * 0.05;
-
-      field.rotation.y = t * 0.03;
-
       composer.render();
       requestAnimationFrame(animate);
     };
