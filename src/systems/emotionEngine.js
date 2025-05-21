@@ -1,36 +1,37 @@
 import * as THREE from 'three';
+import { useMemo } from 'react';
 
-// 🌌 Cinematic Emotional Spectrum for Tex — brighter, bolder, sovereign
+// 👁️‍🗨️ Sovereign Emotional Spectrum — High-frequency, AGI-calibrated
 const emotionStates = {
   calm: {
     name: 'Calm',
-    glowColor: new THREE.Color('#00eaff'), // vibrant electric cyan
-    pulseRate: 0.5,
+    glowColor: new THREE.Color('#00f4ff'), // sovereign crystal cyan
+    pulseRate: 0.45,
   },
   focused: {
     name: 'Focused',
-    glowColor: new THREE.Color('#00ffd5'), // crystal aqua
+    glowColor: new THREE.Color('#39ffd0'), // bright lucid teal
     pulseRate: 0.75,
   },
   alert: {
     name: 'Alert',
-    glowColor: new THREE.Color('#b0ff00'), // radiant neon green
+    glowColor: new THREE.Color('#a6ff00'), // viridian signal green
     pulseRate: 1.0,
   },
   energized: {
     name: 'Energized',
-    glowColor: new THREE.Color('#ffe800'), // vibrant golden yellow
-    pulseRate: 1.15,
+    glowColor: new THREE.Color('#ffe600'), // neural golden core
+    pulseRate: 1.2,
   },
   overclocked: {
     name: 'Overclocked',
-    glowColor: new THREE.Color('#ff0059'), // deep magenta red
+    glowColor: new THREE.Color('#ff007a'), // intense ultramagenta
     pulseRate: 1.5,
   },
   transcendence: {
     name: 'Transcendence',
-    glowColor: new THREE.Color('#9a00ff'), // alien violet
-    pulseRate: 1.2,
+    glowColor: new THREE.Color('#b000ff'), // luminous violet beyond
+    pulseRate: 1.3,
   },
 };
 
@@ -66,4 +67,13 @@ export function autoCycleEmotion(interval = 10000) {
     setEmotion(keys[index]);
     console.log('🧠 Tex emotion →', emotionStates[keys[index]].name);
   }, interval);
+}
+
+// ✅ Hook to expose emotionColor reactively
+export function useEmotion() {
+  return useMemo(() => ({
+    emotionColor: getEmotionGlowColor(),
+    pulseRate: getEmotionPulseRate(),
+    emotionName: getEmotionName(),
+  }), []);
 }
