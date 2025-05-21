@@ -13,7 +13,7 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
         vUv = uv;
         vec3 pos = position;
 
-        float taper = 1.0 - smoothstep(2.8, 3.4, abs(pos.y)); // widened taper
+        float taper = 1.0 - smoothstep(2.8, 3.4, abs(pos.y));
         pos.x *= taper;
 
         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -29,12 +29,12 @@ export function createSpineShaderMaterial(emotionColor = '#00faff') {
 
       float coreLine(vec2 uv) {
         float d = abs(uv.x - 0.5);
-        return 1.0 - smoothstep(0.012, 0.028, d); // ⬅️ slightly thicker line
+        return 1.0 - smoothstep(0.015, 0.03, d); // widened just a hair
       }
 
       float verticalFade(vec2 uv) {
-        float top = smoothstep(1.0, 0.75, uv.y);    // ⬅️ fade in more gradually from top
-        float bottom = smoothstep(0.0, 0.25, uv.y); // ⬅️ fade in more gradually from bottom
+        float top = pow(smoothstep(1.0, 0.7, uv.y), 1.5);
+        float bottom = pow(smoothstep(0.0, 0.3, uv.y), 1.5);
         return top * bottom;
       }
 
