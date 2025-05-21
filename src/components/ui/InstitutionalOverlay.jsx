@@ -1,45 +1,39 @@
-'use client';
+// InstitutionalOverlay.jsx
+import React from "react";
+import { motion } from "framer-motion";
 
-import React, { useEffect, useState } from 'react';
-import { getNeedPulse } from '@/systems/needPulse';
-import { getCurrentEmotionIntensity, getCurrentGlowColor } from '@/systems/emotionEngine';
-
-export default function InstitutionalOverlay({ onStateChange }) {
-  const [pulse, setPulse] = useState(0.4);
-  const [emotion, setEmotion] = useState(0.6);
-  const [glowColor, setGlowColor] = useState('#00ffaa');
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const p = getNeedPulse();
-      const e = getCurrentEmotionIntensity();
-      const c = getCurrentGlowColor();
-
-      setPulse(p);
-      setEmotion(e);
-      setGlowColor(typeof c === 'string' ? c : c?.getStyle?.() || '#00ffaa');
-
-      if (onStateChange) {
-        onStateChange({ pulse: p, emotion: e, glowColor: c });
-      }
-    }, 300);
-
-    return () => clearInterval(interval);
-  }, []);
-
+export default function InstitutionalOverlay() {
   return (
-    <div
-      className="absolute top-6 right-6 px-4 py-2 rounded-lg text-sm font-mono shadow-md z-20"
-      style={{
-        backgroundColor: '#0f1117cc',
-        color: glowColor,
-        border: `1px solid ${glowColor}`,
+    <motion.div
+      className="pointer-events-none absolute inset-0 z-40"
+      animate={{
+        opacity: [0.04, 0.07, 0.03, 0.05, 0.02],
+        filter: [
+          "blur(0.5px) contrast(1.2)",
+          "blur(0.4px) contrast(1.4)",
+          "blur(0.6px) contrast(1.1)",
+          "blur(0.5px) contrast(1.3)",
+          "blur(0.4px) contrast(1.2)"
+        ]
       }}
-    >
-      <div>🧠 <strong>AGI Online</strong></div>
-      <div>🎯 Emotion: {emotion.toFixed(2)}</div>
-      <div>💡 Pulse: {pulse.toFixed(2)}</div>
-      <div>🎨 Glow: {glowColor}</div>
-    </div>
+      transition={{
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }}
+      style={{
+        background: `
+          repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,0.015) 0px,
+            rgba(255,255,255,0.015) 1px,
+            transparent 2px,
+            transparent 6px
+          ),
+          radial-gradient(circle at 50% 30%, rgba(0,255,128,0.02), transparent 80%)
+        `,
+        mixBlendMode: "overlay"
+      }}
+    />
   );
 }
