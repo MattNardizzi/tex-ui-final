@@ -42,7 +42,7 @@ export default function StrategyCoreShell() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
-    // ✨ Bloom composer
+    // ✨ Postprocessing (Bloom)
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
     composer.addPass(
@@ -54,30 +54,30 @@ export default function StrategyCoreShell() {
       )
     );
 
-    // 🌐 Core Beam — slightly thicker & shorter
-    const beamGeometry = new THREE.PlaneGeometry(0.0725, 2.4, 1, 1);
+    // 🌐 Core Beam (final thickness and height)
+    const beamGeometry = new THREE.PlaneGeometry(0.075, 2.4, 1, 1);
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Auto emotion loop
+    // 🔁 Emotion cycling
     autoCycleEmotion(10000);
 
-    // 🔄 Animate loop
+    // 🎞️ Animation loop
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
 
       const currentEmotion = getEmotionName();
-      const targetColor = getEmotionGlowColor();
+      const nextColor = getEmotionGlowColor();
       const currentColor = beamMaterial.uniforms.uColor.value;
 
       if (lastEmotionRef.current !== currentEmotion) {
         lastEmotionRef.current = currentEmotion;
-        currentColor.lerp(targetColor, 0.1);
+        currentColor.lerp(nextColor, 0.1);
       } else {
-        currentColor.lerp(targetColor, 0.04);
+        currentColor.lerp(nextColor, 0.04);
       }
 
       composer.render();
@@ -85,7 +85,7 @@ export default function StrategyCoreShell() {
     };
     animate();
 
-    // 📏 Responsive resizing
+    // 📏 Window resizing
     const handleResize = () => {
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -96,7 +96,7 @@ export default function StrategyCoreShell() {
     };
     window.addEventListener('resize', handleResize);
 
-    // 🧼 Cleanup
+    // 🧼 Cleanup on destroy
     return () => {
       window.removeEventListener('resize', handleResize);
       mountRef.current.removeChild(renderer.domElement);
@@ -109,12 +109,15 @@ export default function StrategyCoreShell() {
       ref={mountRef}
       className="relative w-screen h-screen bg-black overflow-hidden"
     >
+      {/* Top and bottom fade mask */}
       <div className="pointer-events-none absolute inset-0 z-10 fade-mask" />
 
+      {/* AGI Overlays */}
       <TypingPanel />
       <InstitutionalOverlay />
       <MutationOverlay />
 
+      {/* Finance HUD */}
       <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
         <FinanceTicker />
       </div>
