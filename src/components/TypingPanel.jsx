@@ -1,16 +1,11 @@
 "use client";
 
-
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export default function TypingPanel() {
-  // ... rest of your code
-}
-
   const [log, setLog] = useState(["Tex initialized..."]);
 
-  // Simulate output feed (replace with tex_core_api later)
   useEffect(() => {
     const interval = setInterval(() => {
       setLog((prev) => [
@@ -18,6 +13,7 @@ export default function TypingPanel() {
         `Tex: ${generateMockOutput()}`
       ]);
     }, 3000);
+
     return () => clearInterval(interval);
   }, []);
 
