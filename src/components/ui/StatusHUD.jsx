@@ -1,8 +1,8 @@
-import * as React from "react";
+"use client";
+
 import { useEffect, useState } from "react";
 import getNeedPulse from "../../systems/getNeedPulse";
 import emotionEngine, { getEmotionLabel } from "../../systems/emotionEngine";
-
 
 export default function StatusHUD() {
   const [pulse, setPulse] = useState(0.2);
@@ -12,15 +12,10 @@ export default function StatusHUD() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const newPulse = getNeedPulse();
-      const newColor = emotionEngine();
-      const newEmotion = getEmotionLabel();
-
-      setPulse(newPulse);
-      setColor(newColor);
-      setEmotion(newEmotion);
+      setPulse(getNeedPulse());
+      setColor(emotionEngine());
+      setEmotion(getEmotionLabel());
     }, 1500);
-
     return () => clearInterval(interval);
   }, []);
 
