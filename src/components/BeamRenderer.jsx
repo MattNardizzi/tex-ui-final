@@ -3,7 +3,9 @@
 import React, { useRef, useEffect } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+
 import { useEmotion } from '@/systems/emotionEngine';
+import { getNeedPulse } from '@/systems/needPulse'; // ✅ Injected real-time pulse logic
 import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 
 export default function BeamRenderer() {
@@ -31,15 +33,18 @@ export default function BeamRenderer() {
       new THREE.Color(emotionColor),
       0.05
     );
+
+    // 👇 Real-time pulse from cognition
+    beamRef.current.material.uniforms.uGain.value = getNeedPulse();
   });
 
   return (
     <mesh
       ref={beamRef}
-      position={[0, 1.35, 0]} // ⬆️ Lifted to float above the ring
+      position={[0, 1.35, 0]} // Lifted above the ring
       rotation={[0, 0, 0]}
     >
-      <planeGeometry args={[0.36, 3.4]} /> {/* Widened for stronger presence */}
+      <planeGeometry args={[0.36, 3.4]} />
     </mesh>
   );
 }
