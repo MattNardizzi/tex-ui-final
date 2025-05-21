@@ -1,33 +1,34 @@
 'use client';
 
-import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import React from 'react';
+import { Canvas } from '@react-three/fiber';
 import { PerspectiveCamera } from '@react-three/drei';
-import * as THREE from 'three';
 
-import { useEmotion } from '@/systems/emotionEngine';
 import BeamRenderer from '../BeamRenderer.jsx';
+import TypingPanel from '../TypingPanel';
+import InstitutionalOverlay from './InstitutionalOverlay';
+import MutationOverlay from '../MutationOverlay';
+import FinanceTicker from './FinanceTicker';
 
 export default function StrategyCoreShell() {
-  const cameraRef = useRef();
-  const { emotionColor } = useEmotion();
-
   return (
     <div className="relative w-screen h-screen bg-black overflow-hidden">
       <Canvas
         gl={{ antialias: true, alpha: true }}
         dpr={[1, 2]}
-        camera={{ position: [0, 1.35, 4.5], fov: 50 }}
+        camera={{ position: [0, 0, 5], fov: 60 }}
       >
-        <PerspectiveCamera
-          makeDefault
-          ref={cameraRef}
-          position={[0, 1.35, 4.5]}
-          fov={50}
-        />
-        <ambientLight intensity={0.25} color={emotionColor} />
+        <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+        <ambientLight intensity={0.3} />
         <BeamRenderer />
       </Canvas>
+
+      <TypingPanel />
+      <InstitutionalOverlay />
+      <MutationOverlay />
+      <div className="pointer-events-none absolute top-2 w-full flex justify-center z-20">
+        <FinanceTicker />
+      </div>
     </div>
   );
 }
