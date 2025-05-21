@@ -8,6 +8,7 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 
 import {
   getEmotionGlowColor,
+  getEmotionName,
   autoCycleEmotion,
 } from '@/systems/emotionEngine';
 import { createSpineShaderMaterial } from './SpineShaderMaterial';
@@ -19,10 +20,11 @@ import MutationOverlay from '../MutationOverlay';
 
 export default function StrategyCoreShell() {
   const mount = useRef(null);
+  const lastEmotion = useRef(getEmotionName());
 
   useEffect(() => {
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x000000); // pure black background
+    scene.background = new THREE.Color(0x000000); // Pure sovereign void
 
     const camera = new THREE.PerspectiveCamera(
       60,
@@ -38,35 +40,43 @@ export default function StrategyCoreShell() {
     mount.current.appendChild(renderer.domElement);
 
     const composer = new EffectComposer(renderer);
-    composer.addPass(new RenderPass(scene, camera));
-    composer.addPass(
-      new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.35, // stronger bloom for sovereign glow
-        0.4,
-        0.6
-      )
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.3, // subtle but rich bloom
+      0.4,
+      0.65
     );
+    composer.addPass(new RenderPass(scene, camera));
+    composer.addPass(bloomPass);
 
-    // 🧠 Create spine mesh (shortened for cinematic balance)
-    const beamGeometry = new THREE.PlaneGeometry(0.05, 2.6, 1, 1);
+    // 🧠 Core Beam
+    const beamGeometry = new THREE.PlaneGeometry(0.045, 2.25, 1, 1); // reduced height
     const beamMaterial = createSpineShaderMaterial();
     const beam = new THREE.Mesh(beamGeometry, beamMaterial);
     beam.rotation.y = Math.PI;
     scene.add(beam);
 
-    // 🔁 Auto-cycle through emotional states
-    autoCycleEmotion(10000); // changes every 10 seconds
+    // 🔁 Emotions auto-cycling
+    autoCycleEmotion(10000);
 
-    // 🔄 Animate
+    // 🔄 Animate loop
     const animate = () => {
       const t = performance.now() * 0.001;
       beamMaterial.uniforms.uTime.value = t;
 
-      // Smooth transition toward target color
-      const current = beamMaterial.uniforms.uColor.value;
-      const target = getEmotionGlowColor(); // now returns THREE.Color
-      current.lerp(target, 0.06);
+      // Only lerp when emotion name changes (avoids bleed)
+      const currentEmotion = getEmotionName();
+      const colorTarget = getEmotionGlowColor();
+      const colorUniform = beamMaterial.uniforms.uColor.value;
+
+      if (lastEmotion.current !== currentEmotion) {
+        lastEmotion.current = currentEmotion;
+        colorUniform.lerp(colorTarget, 0.1);
+      } else {
+        colorUniform.lerp(colorTarget, 0.04);
+      }
+
+      // Optionally adjust bloom intensity by pulse or emotion (future)
 
       composer.render();
       requestAnimationFrame(animate);
