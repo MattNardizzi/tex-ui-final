@@ -12,7 +12,7 @@ export default function BeamRenderer() {
   const beamRef = useRef();
 
   useEffect(() => {
-    const fallbackColor = new THREE.Color('#ff00ff'); // 🔥 hot pink fallback
+    const fallbackColor = new THREE.Color('#ff00ff'); // hot pink for visibility
     const mat = createSpineShaderMaterial(fallbackColor);
     if (beamRef.current) {
       beamRef.current.material = mat;
@@ -22,7 +22,14 @@ export default function BeamRenderer() {
   useFrame(({ clock }) => {
     const time = clock.getElapsedTime();
     const gain = Math.max(0.7, getNeedPulse());
-    const color = getCurrentGlowColor();
+
+    // 🔒 Force getCurrentGlowColor() to become a THREE.Color object
+    let colorValue = getCurrentGlowColor();
+    const color = typeof colorValue === 'string'
+      ? new THREE.Color(colorValue)
+      : colorValue instanceof THREE.Color
+        ? colorValue
+        : new THREE.Color('#00ffaa'); // Fallback to safe teal
 
     if (!beamRef.current?.material?.uniforms) return;
 
