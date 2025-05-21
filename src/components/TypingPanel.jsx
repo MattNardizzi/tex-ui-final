@@ -1,42 +1,44 @@
 'use client';
 
-import React, { useEffect, useRef } from "react";
+import React, { useState, useEffect } from 'react';
 
-import GazeEyes from "./GazeEyes.jsx";
-import TypingPanel from "../TypingPanel.jsx"; // ✅ CORRECTED PATH
-import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
-import FinanceTicker from "./FinanceTicker.jsx";
-
-import { getNeedPulse } from "../../systems/getNeedPulse.js";
-import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine.js";
-
-export default function StrategyCoreShell() {
-  const mount = useRef(null);
+export default function TypingPanel() {
+  const [input, setInput] = useState('');
+  const [lastTyped, setLastTyped] = useState('');
 
   useEffect(() => {
-    // ✅ Placeholder for your Three.js / Tone.js scene
-    // You can mount your shader beam, pulsing spine, and ambient fog here using mount.current
-  }, []);
+    if (input.trim() !== '') {
+      setLastTyped(input);
+    }
+  }, [input]);
+
+  const handleChange = (e) => {
+    setInput(e.target.value);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      // ⬇️ You can connect this to Tex's brain later
+      console.log('[Tex] →', input);
+      setInput('');
+    }
+  };
 
   return (
-    <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
-      
-      {/* 👁️ Gaze awareness */}
-      <div className="pointer-events-none absolute top-4 left-1/2 -translate-x-1/2">
-        <GazeEyes />
-      </div>
-
-      {/* 💬 Typing input */}
-      <TypingPanel />
-
-      {/* 🧠 Institutional overlay panel */}
-      <InstitutionalOverlay />
-
-      {/* 📈 Finance ticker bar */}
-      <div className="pointer-events-none absolute bottom-2 w-full flex justify-center">
-        <FinanceTicker />
-      </div>
-
+    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-[90%] md:w-[70%]">
+      <input
+        type="text"
+        placeholder="Ask Tex anything..."
+        value={input}
+        onChange={handleChange}
+        onKeyPress={handleKeyPress}
+        className="w-full px-4 py-3 bg-black/80 text-white text-lg rounded-xl border border-[#6ed6ff] shadow-lg focus:outline-none focus:ring-2 focus:ring-[#6ed6ff] transition-all duration-150 placeholder-gray-400"
+      />
+      {lastTyped && (
+        <div className="mt-2 text-sm text-[#6ed6ff] tracking-wide">
+          Last command: <span className="italic">{lastTyped}</span>
+        </div>
+      )}
     </div>
   );
 }
