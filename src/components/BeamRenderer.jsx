@@ -11,37 +11,35 @@ import { createSpineShaderMaterial } from './ui/SpineShaderMaterial';
 export default function BeamRenderer() {
   const beamRef = useRef();
 
-  // Initialize spine shader material once
   useEffect(() => {
-    const initialColor = getCurrentGlowColor();
-    const mat = createSpineShaderMaterial(initialColor);
-
+    const mat = createSpineShaderMaterial(new THREE.Color("#00ff88")); // TEMP color
     if (beamRef.current) {
       beamRef.current.material = mat;
     }
   }, []);
 
-  // Animate pulse + glow over time
   useFrame(({ clock }) => {
-    if (!beamRef.current || !beamRef.current.material) return;
-
-    const time = clock.getElapsedTime();
+    const t = clock.getElapsedTime();
     const gain = getNeedPulse();
-    const glowColor = getCurrentGlowColor();
 
-    const uniforms = beamRef.current.material.uniforms;
-    if (!uniforms) return;
+    if (!beamRef.current?.material?.uniforms) return;
 
-    uniforms.uTime.value = time;
-    uniforms.uGain.value = gain;
-
-    // Smooth color transition (no flicker)
-    uniforms.uColor.value.lerp(glowColor, 0.05);
+    const u = beamRef.current.material.uniforms;
+    u.uTime.value = t;
+    u.uGain.value = gain;
+    u.uColor.value.lerp(new THREE.Color("#00ff88"), 0.1); // TEMP fixed glow
   });
 
   return (
-    <mesh ref={beamRef} position={[0, 0, 0]}>
-      <cylinderGeometry args={[0.012, 0.012, 3.4, 64, 1, true]} />
-    </mesh>
+    <>
+      {/* 🔆 TEMP debug light */}
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 0, 2]} intensity={2} color="#00ffaa" />
+
+      {/* 🧬 Spine Beam */}
+      <mesh ref={beamRef} position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.05, 0.05, 4, 32, 1, true]} />
+      </mesh>
+    </>
   );
 }
