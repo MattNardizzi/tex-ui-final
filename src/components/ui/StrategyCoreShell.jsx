@@ -2,16 +2,13 @@
 
 import React, { useRef, useEffect } from "react";
 import { Canvas } from '@react-three/fiber';
+import { OrthographicCamera } from '@react-three/drei';
 
 // ✅ UI Components
 import InstitutionalOverlay from "./InstitutionalOverlay.jsx";
 import FinanceTicker from "./FinanceTicker.jsx";
 import TypingPanel from "../TypingPanel.jsx";
 import BeamRenderer from "../BeamRenderer.jsx";
-
-// ✅ Systems
-import { getNeedPulse } from "../../systems/getNeedPulse.js";
-import { getCurrentGlowColor, getCurrentEmotionIntensity } from "../../systems/emotionEngine.js";
 
 export default function StrategyCoreShell() {
   const mount = useRef(null);
@@ -23,8 +20,13 @@ export default function StrategyCoreShell() {
   return (
     <div ref={mount} className="relative w-screen h-screen bg-black overflow-hidden">
 
-      {/* 🌐 Centered spine beam */}
-      <Canvas className="absolute inset-0 z-10 pointer-events-none">
+      {/* 🌐 Spine Render (Fixed Centered Canvas) */}
+      <Canvas
+        className="absolute inset-0 z-10 pointer-events-none"
+        orthographic
+        camera={{ position: [0, 0, 10], zoom: 100 }}
+      >
+        <ambientLight intensity={0.6} />
         <BeamRenderer />
       </Canvas>
 
